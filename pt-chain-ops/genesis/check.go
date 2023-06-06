@@ -33,13 +33,13 @@ const (
 	// in the future.
 	MaxPredeploySlotChecks = 1000
 
-	// MaxOVMETHSlotChecks is the maximum number of OVM ETH storage slots to check
-	// when validating the OVM ETH migration.
-	MaxOVMETHSlotChecks = 5000
+	// MaxPVMETHSlotChecks is the maximum number of PVM ETH storage slots to check
+	// when validating the PVM ETH migration.
+	MaxPVMETHSlotChecks = 5000
 
-	// OVMETHSampleLikelihood is the probability that a storage slot will be checked
-	// when validating the OVM ETH migration.
-	OVMETHSampleLikelihood = 0.1
+	// PVMETHSampleLikelihood is the probability that a storage slot will be checked
+	// when validating the PVM ETH migration.
+	PVMETHSampleLikelihood = 0.1
 )
 
 type StorageCheckMap = map[common.Hash]common.Hash
@@ -266,7 +266,7 @@ func PostCheckPredeploys(prevDB, currDB *state.StateDB) error {
 
 		// Balances and nonces should match legacy
 		oldNonce := prevDB.GetNonce(addr)
-		oldBalance := ether.GetOVMETHBalance(prevDB, addr)
+		oldBalance := ether.GetPVMETHBalance(prevDB, addr)
 		newNonce := currDB.GetNonce(addr)
 		newBalance := currDB.GetBalance(addr)
 		if oldNonce != newNonce {
@@ -389,7 +389,7 @@ func PostCheckLegacyETH(prevDB, migratedDB *state.StateDB, migrationData crossdo
 	}
 
 	for _, addr := range migrationData.Addresses() {
-		addresses[ether.CalcOVMETHStorageKey(addr)] = addr
+		addresses[ether.CalcPVMETHStorageKey(addr)] = addr
 	}
 
 	log.Info("checking legacy eth fixed storage slots")
@@ -401,7 +401,7 @@ func PostCheckLegacyETH(prevDB, migratedDB *state.StateDB, migrationData crossdo
 	}
 
 	var count int
-	threshold := 100 - int(100*OVMETHSampleLikelihood)
+	threshold := 100 - int(100*PVMETHSampleLikelihood)
 	progress := util.ProgressLogger(100, "checking legacy eth balance slots")
 	var innerErr error
 	err := prevDB.ForEachStorage(predeploys.LegacyERC20ETHAddr, func(key, value common.Hash) bool {
@@ -425,29 +425,29 @@ func PostCheckLegacyETH(prevDB, migratedDB *state.StateDB, migrationData crossdo
 		// Grab the address, and bail if we can't find it.
 		addr, ok := addresses[key]
 		if !ok {
-			innerErr = fmt.Errorf("unknown OVM_ETH storage slot %s", key)
+			innerErr = fmt.Errorf("unknown PVM_ETH storage slot %s", key)
 			return false
 		}
 
-		// Pull out the pre-migration OVM ETH balance, and the state balance.
-		ovmETHBalance := value.Big()
-		ovmETHStateBalance := prevDB.GetBalance(addr)
+		// Pull out the pre-migration PVM ETH balance, and the state balance.
+		pvmETHBalance := value.Big()
+		pvmETHStateBalance := prevDB.GetBalance(addr)
 		// Pre-migration state balance should be zero.
-		if ovmETHStateBalance.Cmp(common.Big0) != 0 {
-			innerErr = fmt.Errorf("expected OVM_ETH pre-migration state balance for %s to be 0, but got %s", addr, ovmETHStateBalance)
+		if pvmETHStateBalance.Cmp(common.Big0) != 0 {
+			innerErr = fmt.Errorf("expected PVM_ETH pre-migration state balance for %s to be 0, but got %s", addr, pvmETHStateBalance)
 			return false
 		}
 
-		// Migrated state balance should equal the OVM ETH balance.
+		// Migrated state balance should equal the PVM ETH balance.
 		migratedStateBalance := migratedDB.GetBalance(addr)
-		if migratedStateBalance.Cmp(ovmETHBalance) != 0 {
-			innerErr = fmt.Errorf("expected OVM_ETH post-migration state balance for %s to be %s, but got %s", addr, ovmETHStateBalance, migratedStateBalance)
+		if migratedStateBalance.Cmp(pvmETHBalance) != 0 {
+			innerErr = fmt.Errorf("expected PVM_ETH post-migration state balance for %s to be %s, but got %s", addr, pvmETHStateBalance, migratedStateBalance)
 			return false
 		}
-		// Migrated OVM ETH balance should be zero, since we wipe the slots.
+		// Migrated PVM ETH balance should be zero, since we wipe the slots.
 		migratedBalance := migratedDB.GetState(predeploys.LegacyERC20ETHAddr, key)
 		if migratedBalance.Big().Cmp(common.Big0) != 0 {
-			innerErr = fmt.Errorf("expected OVM_ETH post-migration ERC20 balance for %s to be 0, but got %s", addr, migratedBalance)
+			innerErr = fmt.Errorf("expected PVM_ETH post-migration ERC20 balance for %s to be 0, but got %s", addr, migratedBalance)
 			return false
 		}
 
@@ -455,10 +455,10 @@ func PostCheckLegacyETH(prevDB, migratedDB *state.StateDB, migrationData crossdo
 		count++
 
 		// Stop iterating if we've checked enough slots.
-		return count < MaxOVMETHSlotChecks
+		return count < MaxPVMETHSlotChecks
 	})
 	if err != nil {
-		return fmt.Errorf("error iterating over OVM_ETH storage: %w", err)
+		return fmt.Errorf("error iterating over PVM_ETH storage: %w", err)
 	}
 	if innerErr != nil {
 		return innerErr

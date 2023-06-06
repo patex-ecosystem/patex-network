@@ -44,18 +44,18 @@ func main() {
 				Required: true,
 			},
 			&cli.StringFlag{
-				Name:     "ovm-addresses",
-				Usage:    "Path to ovm-addresses.json",
+				Name:     "pvm-addresses",
+				Usage:    "Path to pvm-addresses.json",
 				Required: true,
 			},
 			&cli.StringFlag{
-				Name:     "ovm-allowances",
-				Usage:    "Path to ovm-allowances.json",
+				Name:     "pvm-allowances",
+				Usage:    "Path to pvm-allowances.json",
 				Required: true,
 			},
 			&cli.StringFlag{
-				Name:     "ovm-messages",
-				Usage:    "Path to ovm-messages.json",
+				Name:     "pvm-messages",
+				Usage:    "Path to pvm-messages.json",
 				Required: true,
 			},
 			&cli.StringFlag{
@@ -120,15 +120,15 @@ func main() {
 				return err
 			}
 
-			ovmAddresses, err := crossdomain.NewAddresses(ctx.String("ovm-addresses"))
+			pvmAddresses, err := crossdomain.NewAddresses(ctx.String("pvm-addresses"))
 			if err != nil {
 				return err
 			}
-			ovmAllowances, err := crossdomain.NewAllowances(ctx.String("ovm-allowances"))
+			pvmAllowances, err := crossdomain.NewAllowances(ctx.String("pvm-allowances"))
 			if err != nil {
 				return err
 			}
-			ovmMessages, err := crossdomain.NewSentMessageFromJSON(ctx.String("ovm-messages"))
+			pvmMessages, err := crossdomain.NewSentMessageFromJSON(ctx.String("pvm-messages"))
 			if err != nil {
 				return err
 			}
@@ -139,18 +139,18 @@ func main() {
 
 			log.Info(
 				"Loaded witness data",
-				"ovmAddresses", len(ovmAddresses),
+				"pvmAddresses", len(pvmAddresses),
 				"evmAddresses", len(evmAddresses),
-				"ovmAllowances", len(ovmAllowances),
-				"ovmMessages", len(ovmMessages),
+				"pvmAllowances", len(pvmAllowances),
+				"pvmMessages", len(pvmMessages),
 				"evmMessages", len(evmMessages),
 			)
 
 			migrationData := crossdomain.MigrationData{
-				OvmAddresses:  ovmAddresses,
+				OvmAddresses:  pvmAddresses,
 				EvmAddresses:  evmAddresses,
-				OvmAllowances: ovmAllowances,
-				OvmMessages:   ovmMessages,
+				OvmAllowances: pvmAllowances,
+				OvmMessages:   pvmMessages,
 				EvmMessages:   evmMessages,
 			}
 

@@ -114,7 +114,7 @@ func (w *LegacyWithdrawal) Decode(data []byte) error {
 }
 
 // Hash will compute the legacy style hash that is computed in the
-// OVM_L2ToL1MessagePasser.
+// PVM_L2ToL1MessagePasser.
 func (w *LegacyWithdrawal) Hash() (common.Hash, error) {
 	encoded, err := w.Encode()
 	if err != nil {

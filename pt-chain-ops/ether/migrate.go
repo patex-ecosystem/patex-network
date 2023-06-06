@@ -18,18 +18,18 @@ const (
 	// when iterating the storage trie.
 	checkJobs = 64
 
-	// BalanceSlot is an ordinal used to represent slots corresponding to OVM_ETH
+	// BalanceSlot is an ordinal used to represent slots corresponding to PVM_ETH
 	// balances in the state.
 	BalanceSlot = 1
 
-	// AllowanceSlot is an ordinal used to represent slots corresponding to OVM_ETH
+	// AllowanceSlot is an ordinal used to represent slots corresponding to PVM_ETH
 	// allowances in the state.
 	AllowanceSlot = 2
 )
 
 var (
-	// OVMETHAddress is the address of the OVM ETH predeploy.
-	OVMETHAddress = common.HexToAddress("0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000")
+	// PVMETHAddress is the address of the PVM ETH predeploy.
+	PVMETHAddress = common.HexToAddress("0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000")
 
 	ignoredSlots = map[common.Hash]bool{
 		// Total Supply
@@ -42,7 +42,7 @@ var (
 		common.HexToHash("0x0000000000000000000000000000000000000000000000000000000000000006"): true,
 	}
 
-	// sequencerEntrypointAddr is the address of the OVM sequencer entrypoint contract.
+	// sequencerEntrypointAddr is the address of the PVM sequencer entrypoint contract.
 	sequencerEntrypointAddr = common.HexToAddress("0x4200000000000000000000000000000000000005")
 )
 
@@ -76,7 +76,7 @@ func doMigration(mutableDB *state.StateDB, dbFactory util.DBFactory, addresses [
 	// Mint events are instrumented as regular ETH events in the witness data, so we no longer
 	// need to iterate over mint events during the migration.
 	for _, addr := range addresses {
-		sk := CalcOVMETHStorageKey(addr)
+		sk := CalcPVMETHStorageKey(addr)
 		slotsAddrs[sk] = addr
 		slotsInp[sk] = BalanceSlot
 	}
@@ -90,7 +90,7 @@ func doMigration(mutableDB *state.StateDB, dbFactory util.DBFactory, addresses [
 
 	// Add the old SequencerEntrypoint because someone sent it ETH a long time ago and it has a
 	// balance but none of our instrumentation could easily find it. Special case.
-	entrySK := CalcOVMETHStorageKey(sequencerEntrypointAddr)
+	entrySK := CalcPVMETHStorageKey(sequencerEntrypointAddr)
 	slotsAddrs[entrySK] = sequencerEntrypointAddr
 	slotsInp[entrySK] = BalanceSlot
 
@@ -110,7 +110,7 @@ func doMigration(mutableDB *state.StateDB, dbFactory util.DBFactory, addresses [
 	// values from the channel and add them to the map.
 	var count int
 	var dups int
-	progress := util.ProgressLogger(1000, "Migrated OVM_ETH storage slot")
+	progress := util.ProgressLogger(1000, "Migrated PVM_ETH storage slot")
 	go func() {
 		defer func() { doneCh <- struct{}{} }()
 
@@ -229,7 +229,7 @@ func doMigration(mutableDB *state.StateDB, dbFactory util.DBFactory, addresses [
 		log.Crit("cannot get database", "err", err)
 	}
 
-	totalSupply := getOVMETHTotalSupply(db)
+	totalSupply := getPVMETHTotalSupply(db)
 	delta := new(big.Int).Sub(totalSupply, totalFound)
 	if delta.Cmp(expDiff) != 0 {
 		log.Error(
@@ -257,7 +257,7 @@ func doMigration(mutableDB *state.StateDB, dbFactory util.DBFactory, addresses [
 	// different than the sum of all balances since we no longer track balances inside the contract
 	// itself. The total supply is going to be weird no matter what, might as well set it to zero
 	// so it's explicitly weird instead of implicitly weird.
-	mutableDB.SetState(predeploys.LegacyERC20ETHAddr, getOVMETHTotalSupplySlot(), common.Hash{})
+	mutableDB.SetState(predeploys.LegacyERC20ETHAddr, getPVMETHTotalSupplySlot(), common.Hash{})
 	log.Info("Set the totalSupply to 0")
 
 	return nil

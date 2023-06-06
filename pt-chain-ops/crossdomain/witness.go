@@ -77,7 +77,7 @@ func decodeWitnessCalldata(msg []byte) ([]byte, error) {
 
 // ReadWitnessData will read messages and addresses from a raw l2geth state
 // dump file.
-func ReadWitnessData(path string) ([]*SentMessage, OVMETHAddresses, error) {
+func ReadWitnessData(path string) ([]*SentMessage, PVMETHAddresses, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot open witness data file: %w", err)
@@ -144,12 +144,12 @@ func (s *SentMessage) ToLegacyWithdrawal() (*LegacyWithdrawal, error) {
 	return &w, nil
 }
 
-// OVMETHAddresses represents a list of addresses that interacted with
+// PVMETHAddresses represents a list of addresses that interacted with
 // the ERC20 representation of ether in the pre-bedrock system.
-type OVMETHAddresses map[common.Address]bool
+type PVMETHAddresses map[common.Address]bool
 
 // NewAddresses will read an addresses.json file from the filesystem.
-func NewAddresses(path string) (OVMETHAddresses, error) {
+func NewAddresses(path string) (PVMETHAddresses, error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("cannot find addresses json at %s: %w", path, err)
@@ -160,12 +160,12 @@ func NewAddresses(path string) (OVMETHAddresses, error) {
 		return nil, err
 	}
 
-	ovmeth := make(OVMETHAddresses)
+	pvmeth := make(PVMETHAddresses)
 	for _, addr := range addresses {
-		ovmeth[addr] = true
+		pvmeth[addr] = true
 	}
 
-	return ovmeth, nil
+	return pvmeth, nil
 }
 
 // Allowance represents the allowances that were set in the
@@ -175,7 +175,7 @@ type Allowance struct {
 	To   common.Address `json:"to"`
 }
 
-// NewAllowances will read the ovm-allowances.json from the file system.
+// NewAllowances will read the pvm-allowances.json from the file system.
 func NewAllowances(path string) ([]*Allowance, error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
@@ -194,10 +194,10 @@ func NewAllowances(path string) ([]*Allowance, error) {
 type MigrationData struct {
 	// OvmAddresses represents the set of addresses that interacted with the
 	// LegacyERC20ETH contract before the evm equivalence upgrade
-	OvmAddresses OVMETHAddresses
+	OvmAddresses PVMETHAddresses
 	// EvmAddresses represents the set of addresses that interacted with the
 	// LegacyERC20ETH contract after the evm equivalence upgrade
-	EvmAddresses OVMETHAddresses
+	EvmAddresses PVMETHAddresses
 	// OvmAllowances represents the set of allowances in the LegacyERC20ETH from
 	// before the evm equivalence upgrade
 	OvmAllowances []*Allowance
@@ -215,7 +215,7 @@ func (m *MigrationData) ToWithdrawals() (DangerousUnfilteredWithdrawals, []Inval
 	for _, msg := range m.OvmMessages {
 		wd, err := msg.ToLegacyWithdrawal()
 		if err != nil {
-			return nil, nil, fmt.Errorf("error serializing OVM message: %w", err)
+			return nil, nil, fmt.Errorf("error serializing PVM message: %w", err)
 		}
 		messages = append(messages, wd)
 	}

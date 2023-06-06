@@ -14,10 +14,10 @@ import (
 
 type Config struct {
 	DeployConfig          *genesis.DeployConfig
-	OVMAddressesPath      string
+	PVMAddressesPath      string
 	EVMAddressesPath      string
-	OVMAllowancesPath     string
-	OVMMessagesPath       string
+	PVMAllowancesPath     string
+	PVMMessagesPath       string
 	EVMMessagesPath       string
 	Network               string
 	HardhatDeployments    []string
@@ -31,7 +31,7 @@ type Config struct {
 func Migrate(cfg *Config) (*genesis.MigrationResult, error) {
 	deployConfig := cfg.DeployConfig
 
-	ovmAddresses, err := crossdomain.NewAddresses(cfg.OVMAddressesPath)
+	pvmAddresses, err := crossdomain.NewAddresses(cfg.PVMAddressesPath)
 	if err != nil {
 		return nil, err
 	}
@@ -39,11 +39,11 @@ func Migrate(cfg *Config) (*genesis.MigrationResult, error) {
 	if err != nil {
 		return nil, err
 	}
-	ovmAllowances, err := crossdomain.NewAllowances(cfg.OVMAllowancesPath)
+	pvmAllowances, err := crossdomain.NewAllowances(cfg.PVMAllowancesPath)
 	if err != nil {
 		return nil, err
 	}
-	ovmMessages, err := crossdomain.NewSentMessageFromJSON(cfg.OVMMessagesPath)
+	pvmMessages, err := crossdomain.NewSentMessageFromJSON(cfg.PVMMessagesPath)
 	if err != nil {
 		return nil, err
 	}
@@ -53,10 +53,10 @@ func Migrate(cfg *Config) (*genesis.MigrationResult, error) {
 	}
 
 	migrationData := crossdomain.MigrationData{
-		OvmAddresses:  ovmAddresses,
+		OvmAddresses:  pvmAddresses,
 		EvmAddresses:  evmAddresess,
-		OvmAllowances: ovmAllowances,
-		OvmMessages:   ovmMessages,
+		OvmAllowances: pvmAllowances,
+		OvmMessages:   pvmMessages,
 		EvmMessages:   evmMessages,
 	}
 

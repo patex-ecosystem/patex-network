@@ -11,14 +11,14 @@ type BytesBacked interface {
 	Bytes() []byte
 }
 
-// CalcAllowanceStorageKey calculates the storage key of an allowance in OVM ETH.
+// CalcAllowanceStorageKey calculates the storage key of an allowance in PVM ETH.
 func CalcAllowanceStorageKey(owner common.Address, spender common.Address) common.Hash {
 	inner := CalcStorageKey(owner, common.Big1)
 	return CalcStorageKey(spender, inner)
 }
 
-// CalcOVMETHStorageKey calculates the storage key of an OVM ETH balance.
-func CalcOVMETHStorageKey(addr common.Address) common.Hash {
+// CalcPVMETHStorageKey calculates the storage key of an PVM ETH balance.
+func CalcPVMETHStorageKey(addr common.Address) common.Hash {
 	return CalcStorageKey(addr, common.Big0)
 }
 

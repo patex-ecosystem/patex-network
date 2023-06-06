@@ -53,7 +53,7 @@ func TestMigrateBalances(t *testing.T) {
 				require.NoError(t, err)
 				require.EqualValues(t, common.Big1, db.GetBalance(common.HexToAddress("0x123")))
 				require.EqualValues(t, common.Big2, db.GetBalance(common.HexToAddress("0x456")))
-				require.EqualValues(t, common.Hash{}, db.GetState(predeploys.LegacyERC20ETHAddr, GetOVMETHTotalSupplySlot()))
+				require.EqualValues(t, common.Hash{}, db.GetState(predeploys.LegacyERC20ETHAddr, GetPVMETHTotalSupplySlot()))
 			},
 		},
 		{
@@ -71,7 +71,7 @@ func TestMigrateBalances(t *testing.T) {
 				require.NoError(t, err)
 				require.EqualValues(t, common.Big1, db.GetBalance(common.HexToAddress("0x123")))
 				require.EqualValues(t, common.Big0, db.GetBalance(common.HexToAddress("0x456")))
-				require.EqualValues(t, common.Hash{}, db.GetState(predeploys.LegacyERC20ETHAddr, GetOVMETHTotalSupplySlot()))
+				require.EqualValues(t, common.Hash{}, db.GetState(predeploys.LegacyERC20ETHAddr, GetPVMETHTotalSupplySlot()))
 			},
 		},
 		{
@@ -102,7 +102,7 @@ func TestMigrateBalances(t *testing.T) {
 				require.NoError(t, err)
 				require.EqualValues(t, common.Big1, db.GetBalance(common.HexToAddress("0x123")))
 				require.EqualValues(t, common.Big0, db.GetBalance(common.HexToAddress("0x456")))
-				require.EqualValues(t, common.Hash{}, db.GetState(predeploys.LegacyERC20ETHAddr, GetOVMETHTotalSupplySlot()))
+				require.EqualValues(t, common.Hash{}, db.GetState(predeploys.LegacyERC20ETHAddr, GetPVMETHTotalSupplySlot()))
 			},
 		},
 		{
@@ -199,20 +199,20 @@ func makeLegacyETH(t *testing.T, totalSupply *big.Int, balances map[common.Addre
 	}), nil)
 	require.NoError(t, err)
 
-	db.CreateAccount(OVMETHAddress)
-	db.SetState(OVMETHAddress, getOVMETHTotalSupplySlot(), common.BigToHash(totalSupply))
+	db.CreateAccount(PVMETHAddress)
+	db.SetState(PVMETHAddress, getPVMETHTotalSupplySlot(), common.BigToHash(totalSupply))
 
 	for slot := range ignoredSlots {
-		if slot == getOVMETHTotalSupplySlot() {
+		if slot == getPVMETHTotalSupplySlot() {
 			continue
 		}
-		db.SetState(OVMETHAddress, slot, common.Hash{31: 0xff})
+		db.SetState(PVMETHAddress, slot, common.Hash{31: 0xff})
 	}
 	for addr, balance := range balances {
-		db.SetState(OVMETHAddress, CalcOVMETHStorageKey(addr), common.BigToHash(balance))
+		db.SetState(PVMETHAddress, CalcPVMETHStorageKey(addr), common.BigToHash(balance))
 	}
 	for from, to := range allowances {
-		db.SetState(OVMETHAddress, CalcAllowanceStorageKey(from, to), common.BigToHash(big.NewInt(1)))
+		db.SetState(PVMETHAddress, CalcAllowanceStorageKey(from, to), common.BigToHash(big.NewInt(1)))
 	}
 
 	root, err := db.Commit(false)

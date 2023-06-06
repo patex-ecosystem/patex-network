@@ -47,7 +47,7 @@ func TestRead(t *testing.T) {
 		},
 	}, witnesses)
 
-	require.Equal(t, OVMETHAddresses{
+	require.Equal(t, PVMETHAddresses{
 		common.HexToAddress("0x6340d44c5174588B312F545eEC4a42f8a514eF50"): true,
 	}, addresses)
 }

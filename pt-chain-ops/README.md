@@ -5,20 +5,20 @@ This package performs state surgery. It takes the following input:
 1. A v0 database
 2. A partial `genesis.json`
 3. A list of addresses that transacted on the network prior to this past regenesis.
-4. A list of addresses that performed approvals on prior versions of the OVM ETH contract.
+4. A list of addresses that performed approvals on prior versions of the PVM ETH contract.
 
 It creates an initialized Bedrock Geth database as output. It does this by performing the following steps:
 
 1. Iterates over the old state.
-2. For each account in the old state, add that account and its storage to the new state after copying its balance from the OVM_ETH contract.
+2. For each account in the old state, add that account and its storage to the new state after copying its balance from the PVM_ETH contract.
 3. Iterates over the pre-allocated accounts in the genesis file and adds them to the new state.
-4. Imports any accounts that have OVM ETH balances but aren't in state.
+4. Imports any accounts that have PVM ETH balances but aren't in state.
 5. Configures a genesis block in the new state using `genesis.json`.
 
 It performs the following integrity checks:
 
-1. OVM ETH storage slots must be completely accounted for.
-2. The total supply of OVM ETH migrated must match the total supply of the OVM ETH contract.
+1. PVM ETH storage slots must be completely accounted for.
+2. The total supply of PVM ETH migrated must match the total supply of the PVM ETH contract.
 
 This process takes about two hours on mainnet.
 

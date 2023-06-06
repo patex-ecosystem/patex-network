@@ -198,7 +198,7 @@ func MigrateDB(ldb ethdb.Database, config *DeployConfig, l1Block *types.Block, m
 	log.Info("Starting to migrate ERC20 ETH")
 	err = ether.MigrateBalances(db, dbFactory, migrationData.Addresses(), migrationData.OvmAllowances, int(config.L1ChainID), noCheck)
 	if err != nil {
-		return nil, fmt.Errorf("failed to migrate OVM_ETH: %w", err)
+		return nil, fmt.Errorf("failed to migrate PVM_ETH: %w", err)
 	}
 
 	// We're done messing around with the database, so we can now commit the changes to the DB.

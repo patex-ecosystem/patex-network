@@ -237,7 +237,7 @@ func (d *DeployConfig) GetDeployedAddresses(hh *hardhat.Hardhat) error {
 
 	if d.L1StandardBridgeProxy == (common.Address{}) {
 		var l1StandardBridgeProxyDeployment *hardhat.Deployment
-		l1StandardBridgeProxyDeployment, err = hh.GetDeployment("Proxy__OVM_L1StandardBridge")
+		l1StandardBridgeProxyDeployment, err = hh.GetDeployment("Proxy__PVM_L1StandardBridge")
 		if errors.Is(err, hardhat.ErrCannotFindDeployment) {
 			l1StandardBridgeProxyDeployment, err = hh.GetDeployment("L1StandardBridgeProxy")
 			if err != nil {
@@ -249,7 +249,7 @@ func (d *DeployConfig) GetDeployedAddresses(hh *hardhat.Hardhat) error {
 
 	if d.L1CrossDomainMessengerProxy == (common.Address{}) {
 		var l1CrossDomainMessengerProxyDeployment *hardhat.Deployment
-		l1CrossDomainMessengerProxyDeployment, err = hh.GetDeployment("Proxy__OVM_L1CrossDomainMessenger")
+		l1CrossDomainMessengerProxyDeployment, err = hh.GetDeployment("Proxy__PVM_L1CrossDomainMessenger")
 		if errors.Is(err, hardhat.ErrCannotFindDeployment) {
 			l1CrossDomainMessengerProxyDeployment, err = hh.GetDeployment("L1CrossDomainMessengerProxy")
 			if err != nil {

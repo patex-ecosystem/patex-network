@@ -25,7 +25,7 @@ var (
 	// iterator's callback.
 	ErrStopIteration = errors.New("iteration stopped")
 
-	// MintTopic is the topic for mint events on OVM ETH.
+	// MintTopic is the topic for mint events on PVM ETH.
 	MintTopic = common.HexToHash("0x0f6798a560793a54c3bcfe86a93cde1e73087d944c0ea20544137d4121396885")
 )
 

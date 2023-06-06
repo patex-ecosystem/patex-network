@@ -32,7 +32,7 @@ type LegacyReceipt struct {
 	BlockNumber      *big.Int    `json:"blockNumber,omitempty"`
 	TransactionIndex uint        `json:"transactionIndex"`
 
-	// UsingOVM
+	// UsingPVM
 	L1GasPrice *big.Int   `json:"l1GasPrice" gencodec:"required"`
 	L1GasUsed  *big.Int   `json:"l1GasUsed" gencodec:"required"`
 	L1Fee      *big.Int   `json:"l1Fee" gencodec:"required"`
@@ -61,7 +61,7 @@ type storedReceiptRLP struct {
 	PostStateOrStatus []byte
 	CumulativeGasUsed uint64
 	Logs              []*types.LogForStorage
-	// UsingOVM
+	// UsingPVM
 	L1GasUsed  *big.Int
 	L1GasPrice *big.Int
 	L1Fee      *big.Int

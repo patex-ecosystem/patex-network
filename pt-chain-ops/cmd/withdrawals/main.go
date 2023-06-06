@@ -109,8 +109,8 @@ func main() {
 				Usage: "Address of the L1StandardBridge",
 			},
 			&cli.StringFlag{
-				Name:  "ovm-messages",
-				Usage: "Path to ovm-messages.json",
+				Name:  "pvm-messages",
+				Usage: "Path to pvm-messages.json",
 			},
 			&cli.StringFlag{
 				Name:  "evm-messages",
@@ -986,25 +986,25 @@ func newContracts(ctx *cli.Context, l1Backend, l2Backend bind.ContractBackend) (
 
 // newWithdrawals will create a set of legacy withdrawals
 func newWithdrawals(ctx *cli.Context, l1ChainID *big.Int) ([]*crossdomain.LegacyWithdrawal, error) {
-	ovmMsgs := ctx.String("ovm-messages")
+	pvmMsgs := ctx.String("pvm-messages")
 	evmMsgs := ctx.String("evm-messages")
 	witnessFile := ctx.String("witness-file")
 
-	log.Debug("Migration data", "ovm-path", ovmMsgs, "evm-messages", evmMsgs, "witness-file", witnessFile)
-	var ovmMessages []*crossdomain.SentMessage
+	log.Debug("Migration data", "pvm-path", pvmMsgs, "evm-messages", evmMsgs, "witness-file", witnessFile)
+	var pvmMessages []*crossdomain.SentMessage
 	var err error
-	if ovmMsgs != "" {
-		ovmMessages, err = crossdomain.NewSentMessageFromJSON(ovmMsgs)
+	if pvmMsgs != "" {
+		pvmMessages, err = crossdomain.NewSentMessageFromJSON(pvmMsgs)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	// use empty ovmMessages if its not mainnet. The mainnet messages are
+	// use empty pvmMessages if its not mainnet. The mainnet messages are
 	// committed to in git.
 	if l1ChainID.Cmp(common.Big1) != 0 {
-		log.Info("not using ovm messages because its not mainnet")
-		ovmMessages = []*crossdomain.SentMessage{}
+		log.Info("not using pvm messages because its not mainnet")
+		pvmMessages = []*crossdomain.SentMessage{}
 	}
 
 	var evmMessages []*crossdomain.SentMessage
@@ -1023,7 +1023,7 @@ func newWithdrawals(ctx *cli.Context, l1ChainID *big.Int) ([]*crossdomain.Legacy
 	}
 
 	migrationData := crossdomain.MigrationData{
-		OvmMessages: ovmMessages,
+		OvmMessages: pvmMessages,
 		EvmMessages: evmMessages,
 	}
 
