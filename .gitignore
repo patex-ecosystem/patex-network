@@ -1,0 +1,63 @@
+.DS_Store
+node_modules
+results
+temp
+.nyc_output
+coverage.json
+*.tsbuildinfo
+**/lcov.info
+
+yarn-error.log
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+.pnp.*
+
+dist
+artifacts
+cache
+
+l2geth/build/bin
+packages/contracts/deployments/custom
+packages/contracts/coverage*
+packages/contracts/@ens*
+packages/contracts/@openzeppelin*
+packages/contracts-periphery/coverage*
+packages/contracts-periphery/@openzeppelin*
+packages/contracts-periphery/forge-artifacts*
+
+packages/data-transport-layer/db
+
+packages/integration-tests-bedrock/cache
+packages/integration-tests-bedrock/artifacts
+
+packages/contracts-bedrock/deployments/devnetL1
+packages/contracts-bedrock/deployments/anvil
+
+# vim
+*.sw*
+
+# jetbrains
+.idea/
+
+.env
+.env*
+!.env.example
+*.log
+
+.devnet
+.patex-sepolia
+# Ignore local fuzzing results
+**/testdata/fuzz/
+
+coverage.out
+
+# Ignore bedrock go bindings local output files
+pt-bindings/bin
+
+
+__pycache__
+
+# Ignore echidna artifacts
+crytic-export
+

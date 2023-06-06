@@ -1,0 +1,4 @@
+bin
+# tmp dir
+ptnode_discovery_db/
+ptnode_peerstore_db/

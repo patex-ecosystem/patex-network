@@ -1,0 +1,269 @@
+package metrics
+
+import (
+	"context"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/prometheus/client_golang/prometheus"
+
+	"github.com/patex-ecosystem/patex-network/pt-node/eth"
+	"github.com/patex-ecosystem/patex-network/pt-node/rollup/derive"
+	ptmetrics "github.com/patex-ecosystem/patex-network/pt-service/metrics"
+	txmetrics "github.com/patex-ecosystem/patex-network/pt-service/txmgr/metrics"
+)
+
+const Namespace = "op_batcher"
+
+type Metricer interface {
+	RecordInfo(version string)
+	RecordUp()
+
+	// Records all L1 and L2 block events
+	ptmetrics.RefMetricer
+
+	// Record Tx metrics
+	txmetrics.TxMetricer
+
+	RecordLatestL1Block(l1ref eth.L1BlockRef)
+	RecordL2BlocksLoaded(l2ref eth.L2BlockRef)
+	RecordChannelOpened(id derive.ChannelID, numPendingBlocks int)
+	RecordL2BlocksAdded(l2ref eth.L2BlockRef, numBlocksAdded, numPendingBlocks, inputBytes, outputComprBytes int)
+	RecordChannelClosed(id derive.ChannelID, numPendingBlocks int, numFrames int, inputBytes int, outputComprBytes int, reason error)
+	RecordChannelFullySubmitted(id derive.ChannelID)
+	RecordChannelTimedOut(id derive.ChannelID)
+
+	RecordBatchTxSubmitted()
+	RecordBatchTxSuccess()
+	RecordBatchTxFailed()
+
+	Document() []ptmetrics.DocumentedMetric
+}
+
+type Metrics struct {
+	ns       string
+	registry *prometheus.Registry
+	factory  ptmetrics.Factory
+
+	ptmetrics.RefMetrics
+	txmetrics.TxMetrics
+
+	info prometheus.GaugeVec
+	up   prometheus.Gauge
+
+	// label by openend, closed, fully_submitted, timed_out
+	channelEvs ptmetrics.EventVec
+
+	pendingBlocksCount prometheus.GaugeVec
+	blocksAddedCount   prometheus.Gauge
+
+	channelInputBytes       prometheus.GaugeVec
+	channelReadyBytes       prometheus.Gauge
+	channelOutputBytes      prometheus.Gauge
+	channelClosedReason     prometheus.Gauge
+	channelNumFrames        prometheus.Gauge
+	channelComprRatio       prometheus.Histogram
+	channelInputBytesTotal  prometheus.Counter
+	channelOutputBytesTotal prometheus.Counter
+
+	batcherTxEvs ptmetrics.EventVec
+}
+
+var _ Metricer = (*Metrics)(nil)
+
+func NewMetrics(procName string) *Metrics {
+	if procName == "" {
+		procName = "default"
+	}
+	ns := Namespace + "_" + procName
+
+	registry := ptmetrics.NewRegistry()
+	factory := ptmetrics.With(registry)
+
+	return &Metrics{
+		ns:       ns,
+		registry: registry,
+		factory:  factory,
+
+		RefMetrics: ptmetrics.MakeRefMetrics(ns, factory),
+		TxMetrics:  txmetrics.MakeTxMetrics(ns, factory),
+
+		info: *factory.NewGaugeVec(prometheus.GaugeOpts{
+			Namespace: ns,
+			Name:      "info",
+			Help:      "Pseudo-metric tracking version and config info",
+		}, []string{
+			"version",
+		}),
+		up: factory.NewGauge(prometheus.GaugeOpts{
+			Namespace: ns,
+			Name:      "up",
+			Help:      "1 if the pt-batcher has finished starting up",
+		}),
+
+		channelEvs: ptmetrics.NewEventVec(factory, ns, "", "channel", "Channel", []string{"stage"}),
+
+		pendingBlocksCount: *factory.NewGaugeVec(prometheus.GaugeOpts{
+			Namespace: ns,
+			Name:      "pending_blocks_count",
+			Help:      "Number of pending blocks, not added to a channel yet.",
+		}, []string{"stage"}),
+		blocksAddedCount: factory.NewGauge(prometheus.GaugeOpts{
+			Namespace: ns,
+			Name:      "blocks_added_count",
+			Help:      "Total number of blocks added to current channel.",
+		}),
+
+		channelInputBytes: *factory.NewGaugeVec(prometheus.GaugeOpts{
+			Namespace: ns,
+			Name:      "input_bytes",
+			Help:      "Number of input bytes to a channel.",
+		}, []string{"stage"}),
+		channelReadyBytes: factory.NewGauge(prometheus.GaugeOpts{
+			Namespace: ns,
+			Name:      "ready_bytes",
+			Help:      "Number of bytes ready in the compression buffer.",
+		}),
+		channelOutputBytes: factory.NewGauge(prometheus.GaugeOpts{
+			Namespace: ns,
+			Name:      "output_bytes",
+			Help:      "Number of compressed output bytes from a channel.",
+		}),
+		channelClosedReason: factory.NewGauge(prometheus.GaugeOpts{
+			Namespace: ns,
+			Name:      "channel_closed_reason",
+			Help:      "Pseudo-metric to record the reason a channel got closed.",
+		}),
+		channelNumFrames: factory.NewGauge(prometheus.GaugeOpts{
+			Namespace: ns,
+			Name:      "channel_num_frames",
+			Help:      "Total number of frames of closed channel.",
+		}),
+		channelComprRatio: factory.NewHistogram(prometheus.HistogramOpts{
+			Namespace: ns,
+			Name:      "channel_compr_ratio",
+			Help:      "Compression ratios of closed channel.",
+			Buckets:   append([]float64{0.1, 0.2}, prometheus.LinearBuckets(0.3, 0.05, 14)...),
+		}),
+		channelInputBytesTotal: factory.NewCounter(prometheus.CounterOpts{
+			Namespace: ns,
+			Name:      "input_bytes_total",
+			Help:      "Total number of bytes to a channel.",
+		}),
+		channelOutputBytesTotal: factory.NewCounter(prometheus.CounterOpts{
+			Namespace: ns,
+			Name:      "output_bytes_total",
+			Help:      "Total number of compressed output bytes from a channel.",
+		}),
+
+		batcherTxEvs: ptmetrics.NewEventVec(factory, ns, "", "batcher_tx", "BatcherTx", []string{"stage"}),
+	}
+}
+
+func (m *Metrics) Serve(ctx context.Context, host string, port int) error {
+	return ptmetrics.ListenAndServe(ctx, m.registry, host, port)
+}
+
+func (m *Metrics) Document() []ptmetrics.DocumentedMetric {
+	return m.factory.Document()
+}
+
+func (m *Metrics) StartBalanceMetrics(ctx context.Context,
+	l log.Logger, client *ethclient.Client, account common.Address) {
+	ptmetrics.LaunchBalanceMetrics(ctx, l, m.registry, m.ns, client, account)
+}
+
+// RecordInfo sets a pseudo-metric that contains versioning and
+// config info for the pt-batcher.
+func (m *Metrics) RecordInfo(version string) {
+	m.info.WithLabelValues(version).Set(1)
+}
+
+// RecordUp sets the up metric to 1.
+func (m *Metrics) RecordUp() {
+	prometheus.MustRegister()
+	m.up.Set(1)
+}
+
+const (
+	StageLoaded         = "loaded"
+	StageOpened         = "opened"
+	StageAdded          = "added"
+	StageClosed         = "closed"
+	StageFullySubmitted = "fully_submitted"
+	StageTimedOut       = "timed_out"
+
+	TxStageSubmitted = "submitted"
+	TxStageSuccess   = "success"
+	TxStageFailed    = "failed"
+)
+
+func (m *Metrics) RecordLatestL1Block(l1ref eth.L1BlockRef) {
+	m.RecordL1Ref("latest", l1ref)
+}
+
+// RecordL2BlocksLoaded should be called when a new L2 block was loaded into the
+// channel manager (but not processed yet).
+func (m *Metrics) RecordL2BlocksLoaded(l2ref eth.L2BlockRef) {
+	m.RecordL2Ref(StageLoaded, l2ref)
+}
+
+func (m *Metrics) RecordChannelOpened(id derive.ChannelID, numPendingBlocks int) {
+	m.channelEvs.Record(StageOpened)
+	m.blocksAddedCount.Set(0) // reset
+	m.pendingBlocksCount.WithLabelValues(StageOpened).Set(float64(numPendingBlocks))
+}
+
+// RecordL2BlocksAdded should be called when L2 block were added to the channel
+// builder, with the latest added block.
+func (m *Metrics) RecordL2BlocksAdded(l2ref eth.L2BlockRef, numBlocksAdded, numPendingBlocks, inputBytes, outputComprBytes int) {
+	m.RecordL2Ref(StageAdded, l2ref)
+	m.blocksAddedCount.Add(float64(numBlocksAdded))
+	m.pendingBlocksCount.WithLabelValues(StageAdded).Set(float64(numPendingBlocks))
+	m.channelInputBytes.WithLabelValues(StageAdded).Set(float64(inputBytes))
+	m.channelReadyBytes.Set(float64(outputComprBytes))
+}
+
+func (m *Metrics) RecordChannelClosed(id derive.ChannelID, numPendingBlocks int, numFrames int, inputBytes int, outputComprBytes int, reason error) {
+	m.channelEvs.Record(StageClosed)
+	m.pendingBlocksCount.WithLabelValues(StageClosed).Set(float64(numPendingBlocks))
+	m.channelNumFrames.Set(float64(numFrames))
+	m.channelInputBytes.WithLabelValues(StageClosed).Set(float64(inputBytes))
+	m.channelOutputBytes.Set(float64(outputComprBytes))
+	m.channelInputBytesTotal.Add(float64(inputBytes))
+	m.channelOutputBytesTotal.Add(float64(outputComprBytes))
+
+	var comprRatio float64
+	if inputBytes > 0 {
+		comprRatio = float64(outputComprBytes) / float64(inputBytes)
+	}
+	m.channelComprRatio.Observe(comprRatio)
+
+	m.channelClosedReason.Set(float64(ClosedReasonToNum(reason)))
+}
+
+func ClosedReasonToNum(reason error) int {
+	// CLI-3640
+	return 0
+}
+
+func (m *Metrics) RecordChannelFullySubmitted(id derive.ChannelID) {
+	m.channelEvs.Record(StageFullySubmitted)
+}
+
+func (m *Metrics) RecordChannelTimedOut(id derive.ChannelID) {
+	m.channelEvs.Record(StageTimedOut)
+}
+
+func (m *Metrics) RecordBatchTxSubmitted() {
+	m.batcherTxEvs.Record(TxStageSubmitted)
+}
+
+func (m *Metrics) RecordBatchTxSuccess() {
+	m.batcherTxEvs.Record(TxStageSuccess)
+}
+
+func (m *Metrics) RecordBatchTxFailed() {
+	m.batcherTxEvs.Record(TxStageFailed)
+}
