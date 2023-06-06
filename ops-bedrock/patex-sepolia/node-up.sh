@@ -33,7 +33,7 @@ PT_NODE="$PWD/pt-node"
 CONTRACTS_BEDROCK="$PWD/packages/contracts-bedrock"
 NETWORK=devnetL1
 TESTNET="$PWD/.patex-sepolia"
-set L2OO_ADDRESS="0x6812B7b79E66a32D5f763cAaca592a692eA10698"
+set L2OO_ADDRESS="0x77daF3f9aC6Cfe26ad8669EC95b8A4F6ab810E72"
 
 PT_GETH_GENESIS_URL="https://sepolia.patex.io/genesis.json"
 PT_NODE_ROLLUP_URL="https://sepolia.patex.io/rollup.json"
