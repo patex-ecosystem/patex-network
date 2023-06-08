@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This script starts a local devnet using Docker Compose. We have to use
+# This script starts a local testnet using Docker Compose. We have to use
 # this more complicated Bash script rather than Compose's native orchestration
 # tooling because we need to start each service in a specific order, and specify
 # their configuration along the way. The order is:
@@ -18,11 +18,11 @@
 # a perceived infinite loop. To get around this, we set the timestamp to the current
 # time in this script.
 #
-# This script is safe to run multiple times. It stores state in `.devnet`, and
-# contracts-bedrock/deployments/devnetL1.
+# This script is safe to run multiple times. It stores state in `.testnet`, and
+# contracts-bedrock/deployments/testnetL1.
 #
-# Don't run this script directly. Run it using the makefile, e.g. `make devnet-up`.
-# To clean up your devnet, run `make devnet-clean`.
+# Don't run this script directly. Run it using the makefile, e.g. `make testnet-up`.
+# To clean up your testnet, run `make testnet-clean`.
 
 set -eu
 
@@ -31,7 +31,7 @@ L2_URL="http://localhost:9545"
 
 PT_NODE="$PWD/pt-node"
 CONTRACTS_BEDROCK="$PWD/packages/contracts-bedrock"
-NETWORK=devnetL1
+NETWORK=patex-sepolia
 TESTNET="$PWD/.patex-sepolia"
 set L2OO_ADDRESS="0x77daF3f9aC6Cfe26ad8669EC95b8A4F6ab810E72"
 
