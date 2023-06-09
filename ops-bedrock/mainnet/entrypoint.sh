@@ -2,15 +2,22 @@
 set -exu
 
 VERBOSITY=${GETH_VERBOSITY:-3}
-GETH_DATA_DIR=/db
+GETH_DATA_DIR=/datadir
 GETH_CHAINDATA_DIR="$GETH_DATA_DIR/geth/chaindata"
 GETH_KEYSTORE_DIR="$GETH_DATA_DIR/keystore"
 GENESIS_FILE_PATH="${GENESIS_FILE_PATH:-/genesis.json}"
+GETH_SNAPSHOT_FILE_PATH="/mainnet.tar"
+
 CHAIN_ID=789
 BLOCK_SIGNER_PRIVATE_KEY="496941b9bc92dcf6c01cc587e79a9cf6a0374d3c2c92599bbab57410652af51b"
 BLOCK_SIGNER_ADDRESS="0xcb9474b271d50b3677cd852ce4fd3ca034bc010f"
 RPC_PORT="${RPC_PORT:-8545}"
 WS_PORT="${WS_PORT:-8546}"
+
+if [[  -f "$GETH_SNAPSHOT_FILE_PATH" ]] && [[ ! -d "$GETH_KEYSTORE_DIR" ]]; then
+echo "$GETH_SNAPSHOT_FILE_PATH snapshot available, processing..."
+tar xvf "$GETH_SNAPSHOT_FILE_PATH" -C ./ ;
+fi
 
 if [ ! -d "$GETH_KEYSTORE_DIR" ]; then
 	echo "$GETH_KEYSTORE_DIR missing, running account import"

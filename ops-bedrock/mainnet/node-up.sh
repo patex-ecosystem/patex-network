@@ -38,6 +38,8 @@ set L2OO_ADDRESS=""
 PT_GETH_GENESIS_URL="https://mainnet.patex.io/genesis.json"
 PT_NODE_ROLLUP_URL="https://mainnet.patex.io/rollup.json"
 
+PT_GETH_SNAPSHOT_URL="https://mainnet.patex.io/snapshots/mainnet.tar"
+
 # Helper method that waits for a given URL to be up. Can't use
 # cURL's built-in retry logic because connection reset errors
 # are ignored unless you're using a very recent version of cURL
@@ -67,6 +69,10 @@ fi
 # Download rollup file if not exists
 if [ ! -f "$MAINNET/rollup.json" ]; then
   wget -O "$MAINNET"/rollup.json "$PT_NODE_ROLLUP_URL"
+fi
+# Download snapshot file if not exists
+if [ ! -f "$MAINNET/mainnet.tar" ]; then
+  wget -O "$MAINNET"/mainnet.tar "$PT_GETH_SNAPSHOT_URL"
 fi
 
 # Generate jwt if not exists

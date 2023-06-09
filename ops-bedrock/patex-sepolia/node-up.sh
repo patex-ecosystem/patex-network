@@ -38,6 +38,8 @@ set L2OO_ADDRESS="0x77daF3f9aC6Cfe26ad8669EC95b8A4F6ab810E72"
 PT_GETH_GENESIS_URL="https://sepolia.patex.io/genesis.json"
 PT_NODE_ROLLUP_URL="https://sepolia.patex.io/rollup.json"
 
+PT_GETH_SNAPSHOT_URL="https://testnet.patex.io/snapshots/testnet.tar"
+
 # Helper method that waits for a given URL to be up. Can't use
 # cURL's built-in retry logic because connection reset errors
 # are ignored unless you're using a very recent version of cURL
@@ -67,6 +69,10 @@ fi
 # Download rollup file if not exists
 if [ ! -f "$TESTNET/rollup.json" ]; then
   wget -O "$TESTNET"/rollup.json "$PT_NODE_ROLLUP_URL"
+fi
+# Download snapshot file if not exists
+if [ ! -f "$TESTNET/testnet.tar" ]; then
+  wget -O "$TESTNET"/testnet.tar "$PT_GETH_SNAPSHOT_URL"
 fi
 
 # Generate jwt if not exists

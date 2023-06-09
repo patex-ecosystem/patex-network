@@ -4,6 +4,6 @@ RUN apk add --no-cache jq
 
 COPY entrypoint.sh /entrypoint.sh
 
-VOLUME ["/db"]
+VOLUME ["/datadir"]
 
 ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]

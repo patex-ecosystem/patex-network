@@ -18,9 +18,10 @@ services:
       - "19545:8545"
       - "18060:6060"
     volumes:
-      - "tl2_data:/db"
+      - "tl2_data:/datadir"
       - "${PWD}/../../.patex-sepolia/genesis.json:/genesis.json"
       - "${PWD}/../../.patex-sepolia/jwt.txt:/config/jwt.txt"
+      - "${PWD}/../../.patex-sepolia/testnet.tar:/testnet.tar"
     entrypoint:  # pass the L2 specific flags by overriding the entry-point and adding extra arguments
       - "/bin/sh"
       - "/entrypoint.sh"

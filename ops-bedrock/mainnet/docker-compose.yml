@@ -18,9 +18,10 @@ services:
       - "9545:8545"
       - "8060:6060"
     volumes:
-      - "l2_data:/db"
+      - "l2_data:/datadir"
       - "${PWD}/../../.mainnet/genesis.json:/genesis.json"
       - "${PWD}/../../.mainnet/jwt.txt:/config/jwt.txt"
+      - "${PWD}/../../.mainnet/mainnet.tar:/mainnet.tar"
     entrypoint:  # pass the L2 specific flags by overriding the entry-point and adding extra arguments
       - "/bin/sh"
       - "/entrypoint.sh"
