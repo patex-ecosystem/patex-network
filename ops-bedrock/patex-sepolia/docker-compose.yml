@@ -5,8 +5,8 @@ version: '3.4'
 # service.
 
 volumes:
-  l2_data:
-  pt_log:
+  tl2_data:
+  tpt_log:
 
 
 services:
@@ -15,10 +15,10 @@ services:
       context: .
       dockerfile: Dockerfile.l2
     ports:
-      - "9545:8545"
-      - "8060:6060"
+      - "19545:8545"
+      - "18060:6060"
     volumes:
-      - "l2_data:/db"
+      - "tl2_data:/db"
       - "${PWD}/../../.patex-sepolia/genesis.json:/genesis.json"
       - "${PWD}/../../.patex-sepolia/jwt.txt:/config/jwt.txt"
     entrypoint:  # pass the L2 specific flags by overriding the entry-point and adding extra arguments
@@ -50,18 +50,19 @@ services:
       --p2p.static=/dns4/testnet.patex.io/tcp/9003/p2p/16Uiu2HAmL1aH6b7hvrx3BHPdRqk7d8ynf5p9F1Rhc5fTKBUu696F
       --p2p.scoring.peers=light
       --p2p.ban.peers=true
-      --snapshotlog.file=/pt_log/snapshot.log
+      --snapshotlog.file=/tpt_log/snapshot.log
       --metrics.enabled
       --metrics.addr=0.0.0.0
       --metrics.port=7300
       --pprof.enabled
       --rpc.enable-admin
+      --l1.rpckind=alchemy
     ports:
-      - "7545:8545"
-      - "9003:9003"
-      - "7300:7300"
-      - "6060:6060"
+      - "17545:8545"
+      - "19003:9003"
+      - "17300:7300"
+      - "16060:6060"
     volumes:
       - "${PWD}/../../.patex-sepolia/jwt.txt:/config/jwt.txt"
       - "${PWD}/../../.patex-sepolia/rollup.json:/rollup.json"
-      - pt_log:/pt_log
+      - tpt_log:/tpt_log

@@ -56,6 +56,7 @@ services:
       --metrics.port=7300
       --pprof.enabled
       --rpc.enable-admin
+      --l1.rpckind=alchemy
     ports:
       - "7545:8545"
       - "9003:9003"

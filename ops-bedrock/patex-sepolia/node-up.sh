@@ -27,7 +27,7 @@
 set -eu
 
 L1_URL="https://ethereum-sepolia-archive.allthatnode.com"
-L2_URL="http://localhost:9545"
+L2_URL="http://localhost:19545"
 
 PT_NODE="$PWD/pt-node"
 CONTRACTS_BEDROCK="$PWD/packages/contracts-bedrock"
