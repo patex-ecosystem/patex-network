@@ -17,6 +17,7 @@ services:
     ports:
       - "19545:8545"
       - "18060:6060"
+      - "19546:8546"
     volumes:
       - "tl2_data:/datadir"
       - "${PWD}/../../.patex-sepolia/genesis.json:/genesis.json"

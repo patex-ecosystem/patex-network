@@ -17,6 +17,7 @@ services:
     ports:
       - "9545:8545"
       - "8060:6060"
+      - "9546:8546"
     volumes:
       - "l2_data:/datadir"
       - "${PWD}/../../.mainnet/genesis.json:/genesis.json"
