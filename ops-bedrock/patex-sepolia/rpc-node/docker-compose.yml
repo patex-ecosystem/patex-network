@@ -21,9 +21,9 @@ services:
       - "19546:8546"
     volumes:
       - "tl2_data:/datadir"
-      - "${PWD}/../../.patex-sepolia/genesis.json:/genesis.json"
-      - "${PWD}/../../.patex-sepolia/jwt.txt:/config/jwt.txt"
-      - "${PWD}/../../.patex-sepolia/testnet.tar:/testnet.tar"
+      - "${PWD}/../../../.patex-sepolia/genesis.json:/genesis.json"
+      - "${PWD}/../../../.patex-sepolia/jwt.txt:/config/jwt.txt"
+      - "${PWD}/../../../.patex-sepolia/testnet.tar:/testnet.tar"
     entrypoint:  # pass the L2 specific flags by overriding the entry-point and adding extra arguments
       - "/bin/sh"
       - "/entrypoint.sh"
@@ -34,18 +34,12 @@ services:
     depends_on:
       - l2
     build:
-      context: ../../
+      context: ../../../
       dockerfile: ./pt-node/Dockerfile
     command: >
       pt-node
-      --l1=https://eth-sepolia.g.alchemy.com/v2/qm8q3jYcvUkp2L1YOc1NVD18l_Ea__jn
       --l2=http://l2:8551
       --l2.jwt-secret=/config/jwt.txt
-      --sequencer.enabled
-      --sequencer.l1-confs=0
-      --verifier.l1-confs=0
-      --p2p.sequencer.key=f0829910044f23751f5df8923d971aed8625f5d4f92a08d6dea44eb6388bb393
-      --rollup.config=/rollup.json
       --rpc.addr=0.0.0.0
       --rpc.port=8545
       --p2p.listen.ip=0.0.0.0
@@ -54,12 +48,8 @@ services:
       --p2p.static=/dns4/testnet.patex.io/tcp/9003/p2p/16Uiu2HAmL1aH6b7hvrx3BHPdRqk7d8ynf5p9F1Rhc5fTKBUu696F
       --p2p.scoring.peers=light
       --p2p.ban.peers=true
-      --snapshotlog.file=/tpt_log/snapshot.log
-      --metrics.enabled
-      --metrics.addr=0.0.0.0
-      --metrics.port=7300
-      --pprof.enabled
-      --rpc.enable-admin
+      --rollup.config=/rollup.json
+      --l1=https://eth-sepolia.g.alchemy.com/v2/qm8q3jYcvUkp2L1YOc1NVD18l_Ea__jn
       --l1.rpckind=alchemy
     ports:
       - "17545:8545"
@@ -67,6 +57,6 @@ services:
       - "17300:7300"
       - "16060:6060"
     volumes:
-      - "${PWD}/../../.patex-sepolia/jwt.txt:/config/jwt.txt"
-      - "${PWD}/../../.patex-sepolia/rollup.json:/rollup.json"
+      - "${PWD}/../../../.patex-sepolia/jwt.txt:/config/jwt.txt"
+      - "${PWD}/../../../.patex-sepolia/rollup.json:/rollup.json"
       - tpt_log:/tpt_log

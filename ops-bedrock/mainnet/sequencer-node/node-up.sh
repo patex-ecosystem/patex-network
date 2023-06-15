@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This script starts a local testnet using Docker Compose. We have to use
+# This script starts a local mainnet using Docker Compose. We have to use
 # this more complicated Bash script rather than Compose's native orchestration
 # tooling because we need to start each service in a specific order, and specify
 # their configuration along the way. The order is:
@@ -18,27 +18,23 @@
 # a perceived infinite loop. To get around this, we set the timestamp to the current
 # time in this script.
 #
-# This script is safe to run multiple times. It stores state in `.testnet`, and
-# contracts-bedrock/deployments/testnetL1.
+# This script is safe to run multiple times. It stores state in `.mainnet`, and
+# contracts-bedrock/deployments/mainnetL1.
 #
-# Don't run this script directly. Run it using the makefile, e.g. `make testnet-up`.
-# To clean up your testnet, run `make testnet-clean`.
+# Don't run this script directly. Run it using the makefile, e.g. `make mainnet-up`.
+# To clean up your mainnet, run `make mainnet-clean`.
 
 set -eu
 
-L1_URL="https://ethereum-sepolia-archive.allthatnode.com"
-L2_URL="http://localhost:19545"
+NETWORK=mainnet
+MAINNET="$PWD/.mainnet"
 
-PT_NODE="$PWD/pt-node"
-CONTRACTS_BEDROCK="$PWD/packages/contracts-bedrock"
-NETWORK=patex-sepolia
-TESTNET="$PWD/.patex-sepolia"
-set L2OO_ADDRESS="0x77daF3f9aC6Cfe26ad8669EC95b8A4F6ab810E72"
+L1_URL="https://eth-mainnet.g.alchemy.com/v2/54jLsH3cwubwt6NwJz6cLgoSu7VvII6z"
+L2_URL="http://localhost:9545"
 
-PT_GETH_GENESIS_URL="https://sepolia.patex.io/genesis.json"
-PT_NODE_ROLLUP_URL="https://sepolia.patex.io/rollup.json"
-
-PT_GETH_SNAPSHOT_URL="https://testnet.patex.io/snapshots/testnet.tar"
+PT_GETH_GENESIS_URL="https://mainnet.patex.io/genesis.json"
+PT_NODE_ROLLUP_URL="https://mainnet.patex.io/rollup.json"
+PT_GETH_SNAPSHOT_URL="https://mainnet.patex.io/snapshots/mainnet.tar"
 
 # Helper method that waits for a given URL to be up. Can't use
 # cURL's built-in retry logic because connection reset errors
@@ -60,29 +56,29 @@ function wait_up {
   echo "Done!"
 }
 
-mkdir -p ./.patex-sepolia
+mkdir -p ./.mainnet
 
 # Download genesis file if not exists
-if [ ! -f "$TESTNET/genesis.json" ]; then
-  wget -O "$TESTNET"/genesis.json "$PT_GETH_GENESIS_URL"
+if [ ! -f "$MAINNET/genesis.json" ]; then
+  wget -O "$MAINNET"/genesis.json "$PT_GETH_GENESIS_URL"
 fi
 # Download rollup file if not exists
-if [ ! -f "$TESTNET/rollup.json" ]; then
-  wget -O "$TESTNET"/rollup.json "$PT_NODE_ROLLUP_URL"
+if [ ! -f "$MAINNET/rollup.json" ]; then
+  wget -O "$MAINNET"/rollup.json "$PT_NODE_ROLLUP_URL"
 fi
 # Download snapshot file if not exists
-if [ ! -f "$TESTNET/testnet.tar" ]; then
-  wget -O "$TESTNET"/testnet.tar "$PT_GETH_SNAPSHOT_URL"
+if [ ! -f "$MAINNET/mainnet.tar" ]; then
+  wget -O "$MAINNET"/mainnet.tar "$PT_GETH_SNAPSHOT_URL"
 fi
 
 # Generate jwt if not exists
-if [ ! -f "$TESTNET/jwt.txt" ]; then
-  openssl rand -hex 32 > "$TESTNET"/jwt.txt
+if [ ! -f "$MAINNET/jwt.txt" ]; then
+  openssl rand -hex 32 > "$MAINNET"/jwt.txt
 fi
 
 # Bring up L2.
 (
-  cd ops-bedrock/patex-sepolia
+  cd ops-bedrock/mainnet/sequencer-node
   echo "Bringing up L2..."
   DOCKER_BUILDKIT=1 docker-compose build --progress plain
   docker-compose up -d l2
@@ -93,9 +89,9 @@ fi
 
 # Bring up pt-node
 (
-  cd ops-bedrock/patex-sepolia
+  cd ops-bedrock/mainnet/sequencer-node
   echo "Bringing up pt-node..."
   docker-compose up -d pt-node
 )
 
-echo "Patex Sepolia testnet node is ready."
+echo "Patex Mainnet node is ready."

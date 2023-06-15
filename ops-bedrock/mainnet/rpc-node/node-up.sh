@@ -26,18 +26,14 @@
 
 set -eu
 
+NETWORK=mainnet
+MAINNET="$PWD/.mainnet"
+
 L1_URL="https://eth-mainnet.g.alchemy.com/v2/54jLsH3cwubwt6NwJz6cLgoSu7VvII6z"
 L2_URL="http://localhost:9545"
 
-PT_NODE="$PWD/pt-node"
-CONTRACTS_BEDROCK="$PWD/packages/contracts-bedrock"
-NETWORK=mainnet
-MAINNET="$PWD/.mainnet"
-set L2OO_ADDRESS=""
-
 PT_GETH_GENESIS_URL="https://mainnet.patex.io/genesis.json"
 PT_NODE_ROLLUP_URL="https://mainnet.patex.io/rollup.json"
-
 PT_GETH_SNAPSHOT_URL="https://mainnet.patex.io/snapshots/mainnet.tar"
 
 # Helper method that waits for a given URL to be up. Can't use
@@ -82,7 +78,7 @@ fi
 
 # Bring up L2.
 (
-  cd ops-bedrock/mainnet
+  cd ops-bedrock/mainnet/rpc-node
   echo "Bringing up L2..."
   DOCKER_BUILDKIT=1 docker-compose build --progress plain
   docker-compose up -d l2
@@ -93,7 +89,7 @@ fi
 
 # Bring up pt-node
 (
-  cd ops-bedrock/mainnet
+  cd ops-bedrock/mainnet/rpc-node
   echo "Bringing up pt-node..."
   docker-compose up -d pt-node
 )
