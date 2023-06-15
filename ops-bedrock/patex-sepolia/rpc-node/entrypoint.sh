@@ -14,7 +14,7 @@ WS_PORT="${WS_PORT:-8546}"
 
 if [[  -f "$GETH_SNAPSHOT_FILE_PATH" ]] && [[ ! -d "$GETH_KEYSTORE_DIR" ]]; then
 echo "$GETH_SNAPSHOT_FILE_PATH snapshot available, processing..."
-tar xvf "$GETH_SNAPSHOT_FILE_PATH" . ;
+tar xvf "$GETH_SNAPSHOT_FILE_PATH" -C ./ ;
 fi
 
 if [ ! -d "$GETH_CHAINDATA_DIR" ]; then
