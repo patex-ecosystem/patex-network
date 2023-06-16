@@ -28,8 +28,6 @@ set -eu
 
 NETWORK=patex-sepolia
 TESTNET="$PWD/.patex-sepolia"
-
-L1_URL="https://ethereum-sepolia-archive.allthatnode.com"
 L2_URL="http://localhost:19545"
 
 PT_GETH_GENESIS_URL="https://sepolia.patex.io/genesis.json"
@@ -81,7 +79,7 @@ fi
   cd ops-bedrock/patex-sepolia/sequencer-node
   echo "Bringing up L2..."
   DOCKER_BUILDKIT=1 docker-compose build --progress plain
-  docker-compose up -d l2
+  docker-compose up -d t_l2
   wait_up $L2_URL
 )
 
@@ -91,7 +89,7 @@ fi
 (
   cd ops-bedrock/patex-sepolia/sequencer-node
   echo "Bringing up pt-node..."
-  docker-compose up -d pt-node
+  docker-compose up -d t_pt-node
 )
 
 echo "Patex Sepolia testnet node is ready."

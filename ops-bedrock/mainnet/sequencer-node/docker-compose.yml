@@ -10,7 +10,7 @@ volumes:
 
 
 services:
-  l2:
+  m_l2:
     image: patex-mainnet-l2
     build:
       context: .
@@ -29,17 +29,17 @@ services:
       - "/entrypoint.sh"
       - "--authrpc.jwtsecret=/config/jwt.txt"
 
-  pt-node:
+  m_pt-node:
     image: patex-mainnet-pt-node
     depends_on:
-      - l2
+      - m_l2
     build:
       context: ../../../
       dockerfile: ./pt-node/Dockerfile
     command: >
       pt-node
-      --l1=https://eth-mainnet.g.alchemy.com/v2/54jLsH3cwubwt6NwJz6cLgoSu7VvII6z
-      --l2=http://l2:8551
+      --l1=https://eth-mainnet.g.alchemy.com/v2/iueHs2ZoprYdchPkt7_EHXNG9RX0wfLr
+      --l2=http://m_l2:8551
       --l2.jwt-secret=/config/jwt.txt
       --sequencer.enabled
       --sequencer.l1-confs=0

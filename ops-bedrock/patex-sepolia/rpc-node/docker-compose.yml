@@ -10,7 +10,7 @@ volumes:
 
 
 services:
-  l2:
+  t_l2:
     image: patex-testnet-l2
     build:
       context: .
@@ -29,16 +29,16 @@ services:
       - "/entrypoint.sh"
       - "--authrpc.jwtsecret=/config/jwt.txt"
 
-  pt-node:
+  t_pt-node:
     image: patex-testnet-pt-node
     depends_on:
-      - l2
+      - t_l2
     build:
       context: ../../../
       dockerfile: ./pt-node/Dockerfile
     command: >
       pt-node
-      --l2=http://l2:8551
+      --l2=http://t_l2:8551
       --l2.jwt-secret=/config/jwt.txt
       --rpc.addr=0.0.0.0
       --rpc.port=8545
@@ -49,7 +49,7 @@ services:
       --p2p.scoring.peers=light
       --p2p.ban.peers=true
       --rollup.config=/rollup.json
-      --l1=https://eth-sepolia.g.alchemy.com/v2/qm8q3jYcvUkp2L1YOc1NVD18l_Ea__jn
+      --l1=https://eth-sepolia.g.alchemy.com/v2/lFGZ4V41-wQcvFFQFuICucTHKOQ8GNjT
       --l1.rpckind=alchemy
     ports:
       - "17545:8545"

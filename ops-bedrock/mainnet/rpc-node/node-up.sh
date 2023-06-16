@@ -28,8 +28,6 @@ set -eu
 
 NETWORK=mainnet
 MAINNET="$PWD/.mainnet"
-
-L1_URL="https://eth-mainnet.g.alchemy.com/v2/54jLsH3cwubwt6NwJz6cLgoSu7VvII6z"
 L2_URL="http://localhost:9545"
 
 PT_GETH_GENESIS_URL="https://mainnet.patex.io/genesis.json"
@@ -81,7 +79,7 @@ fi
   cd ops-bedrock/mainnet/rpc-node
   echo "Bringing up L2..."
   DOCKER_BUILDKIT=1 docker-compose build --progress plain
-  docker-compose up -d l2
+  docker-compose up -d m_l2
   wait_up $L2_URL
 )
 
@@ -91,7 +89,7 @@ fi
 (
   cd ops-bedrock/mainnet/rpc-node
   echo "Bringing up pt-node..."
-  docker-compose up -d pt-node
+  docker-compose up -d m_pt-node
 )
 
 echo "Patex Mainnet node is ready."
