@@ -50,4 +50,5 @@ exec geth \
        --maxpeers=0 \
        --datadir="$GETH_DATA_DIR" \
        --txlookuplimit=0 \
+       --rollup.sequencerhttp="http://testnet.patex.io:8545" \
        "$@"
