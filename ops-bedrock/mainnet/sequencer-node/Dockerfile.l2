@@ -1,9 +1,0 @@
-FROM patexhub/pt-geth:latest
-
-RUN apk add --no-cache jq
-
-COPY entrypoint.sh /entrypoint.sh
-
-VOLUME ["/datadir"]
-
-ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
