@@ -48,6 +48,7 @@ services:
       --p2p.static=/dns4/p2p.patex.io/tcp/9003/p2p/16Uiu2HAmCRQDT7aDfx8i1AFih4udq23FaHZcAr2iGM1ad6rMvDWz,/dns4/p2p.patex.io/tcp/9003/p2p/16Uiu2HAmDu6Eaif5SqJuLoLenerfasQ2DWQAa1Mmk8yUShTDAZov,/dns4/p2p.patex.io/tcp/9003/p2p/16Uiu2HAm8dave63K4Pj5F1Bb9Z7EuEss4G13swCYfqKA8taz4CAQ
       --p2p.scoring.peers=light
       --p2p.ban.peers=true
+      --p2p.priv.path=/ptnode_p2p_priv.txt
       --rollup.config=/rollup.json
       --l1=https://eth-mainnet.g.alchemy.com/v2/iueHs2ZoprYdchPkt7_EHXNG9RX0wfLr
       --l1.rpckind=alchemy
@@ -59,4 +60,5 @@ services:
     volumes:
       - "${PWD}/../../../.mainnet/jwt.txt:/config/jwt.txt"
       - "${PWD}/../../../.mainnet/rollup.json:/rollup.json"
+      - "${PWD}/../../../.mainnet/ptnode_p2p_priv.txt:/ptnode_p2p_priv.txt"
       - pt_log:/pt_log

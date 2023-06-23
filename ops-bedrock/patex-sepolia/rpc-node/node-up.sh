@@ -74,6 +74,11 @@ if [ ! -f "$TESTNET/jwt.txt" ]; then
   openssl rand -hex 32 > "$TESTNET"/jwt.txt
 fi
 
+# Generate p2p key if not exists
+if [ ! -f "$TESTNET/ptnode_p2p_priv.txt" ]; then
+  openssl rand -hex 32 > "$TESTNET"/ptnode_p2p_priv.txt
+fi
+
 # Bring up L2.
 (
   cd ops-bedrock/patex-sepolia/rpc-node

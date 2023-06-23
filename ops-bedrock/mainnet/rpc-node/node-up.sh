@@ -74,6 +74,11 @@ if [ ! -f "$MAINNET/jwt.txt" ]; then
   openssl rand -hex 32 > "$MAINNET"/jwt.txt
 fi
 
+# Generate p2p key if not exists
+if [ ! -f "$MAINNET/ptnode_p2p_priv.txt" ]; then
+  openssl rand -hex 32 > "$MAINNET"/ptnode_p2p_priv.txt
+fi
+
 # Bring up L2.
 (
   cd ops-bedrock/mainnet/rpc-node
