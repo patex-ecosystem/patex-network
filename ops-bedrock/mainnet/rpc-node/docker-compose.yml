@@ -45,7 +45,7 @@ services:
       --p2p.listen.ip=0.0.0.0
       --p2p.listen.tcp=9003
       --p2p.listen.udp=9003
-      --p2p.static=/dns4/mainnet.patex.io/tcp/9003/p2p/16Uiu2HAmJYcXrrGmRTmHUQteUb3YuDxS93Ra4jztG1mNWMutJMSX
+      --p2p.static=/dns4/p2p.patex.io/tcp/9003/p2p/16Uiu2HAmCRQDT7aDfx8i1AFih4udq23FaHZcAr2iGM1ad6rMvDWz,/dns4/p2p.patex.io/tcp/9003/p2p/16Uiu2HAmDu6Eaif5SqJuLoLenerfasQ2DWQAa1Mmk8yUShTDAZov,/dns4/p2p.patex.io/tcp/9003/p2p/16Uiu2HAm8dave63K4Pj5F1Bb9Z7EuEss4G13swCYfqKA8taz4CAQ
       --p2p.scoring.peers=light
       --p2p.ban.peers=true
       --rollup.config=/rollup.json
