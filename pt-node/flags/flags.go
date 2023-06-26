@@ -32,6 +32,7 @@ var (
 	L2EngineAddr = cli.StringFlag{
 		Name:   "l2",
 		Usage:  "Address of L2 Engine JSON-RPC endpoints to use (engine and eth namespace required)",
+		Value:  "http://127.0.0.1:8551",
 		EnvVar: prefixEnvVar("L2_ENGINE_RPC"),
 	}
 	RollupConfig = cli.StringFlag{
@@ -214,7 +215,6 @@ var (
 
 var requiredFlags = []cli.Flag{
 	L1NodeAddr,
-	L2EngineAddr,
 }
 
 var optionalFlags = []cli.Flag{
@@ -226,6 +226,7 @@ var optionalFlags = []cli.Flag{
 	L1RPCMaxBatchSize,
 	L1HTTPPollInterval,
 	L2EngineJWTSecret,
+	L2EngineAddr,
 	VerifierL1Confs,
 	SequencerEnabledFlag,
 	SequencerStoppedFlag,
@@ -233,6 +234,8 @@ var optionalFlags = []cli.Flag{
 	SequencerL1Confs,
 	L1EpochPollIntervalFlag,
 	RPCEnableAdmin,
+	RPCListenAddr,
+	RPCListenPort,
 	MetricsEnabledFlag,
 	MetricsAddrFlag,
 	MetricsPortFlag,
