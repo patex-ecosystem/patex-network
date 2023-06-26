@@ -54,7 +54,7 @@ var (
 	RPCListenPort = cli.IntFlag{
 		Name:   "rpc.port",
 		Usage:  "RPC listening port",
-		Value:  8545,
+		Value:  8547,
 		EnvVar: prefixEnvVar("RPC_PORT"),
 	}
 	RPCEnableAdmin = cli.BoolFlag{
