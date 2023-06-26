@@ -31,7 +31,6 @@ TESTNET="$PWD/.patex-sepolia"
 L2_URL="http://localhost:19545"
 
 PT_GETH_GENESIS_URL="https://sepolia.patex.io/genesis.json"
-PT_NODE_ROLLUP_URL="https://sepolia.patex.io/rollup.json"
 PT_GETH_SNAPSHOT_URL="https://testnet.patex.io/snapshots/testnet.tar"
 
 # Helper method that waits for a given URL to be up. Can't use
@@ -59,10 +58,6 @@ mkdir -p ./.patex-sepolia
 # Download genesis file if not exists
 if [ ! -f "$TESTNET/genesis.json" ]; then
   wget -O "$TESTNET"/genesis.json "$PT_GETH_GENESIS_URL"
-fi
-# Download rollup file if not exists
-if [ ! -f "$TESTNET/rollup.json" ]; then
-  wget -O "$TESTNET"/rollup.json "$PT_NODE_ROLLUP_URL"
 fi
 # Download snapshot file if not exists
 if [ ! -f "$TESTNET/testnet.tar" ]; then

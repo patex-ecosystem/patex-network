@@ -104,14 +104,14 @@ var (
 		Name:     "p2p.listen.tcp",
 		Usage:    "TCP port to bind LibP2P to. Any available system port if set to 0.",
 		Required: false,
-		Value:    9222,
+		Value:    9003,
 		EnvVar:   p2pEnv("LISTEN_TCP_PORT"),
 	}
 	ListenUDPPort = cli.UintFlag{
 		Name:     "p2p.listen.udp",
 		Usage:    "UDP port to bind Discv5 to. Same as TCP port if left 0.",
 		Required: false,
-		Value:    0, // can simply match the TCP libp2p port
+		Value:    9003, // can simply match the TCP libp2p port
 		EnvVar:   p2pEnv("LISTEN_UDP_PORT"),
 	}
 	AdvertiseIP = cli.StringFlag{

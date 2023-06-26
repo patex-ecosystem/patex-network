@@ -31,7 +31,6 @@ MAINNET="$PWD/.mainnet"
 L2_URL="http://localhost:9545"
 
 PT_GETH_GENESIS_URL="https://mainnet.patex.io/genesis.json"
-PT_NODE_ROLLUP_URL="https://mainnet.patex.io/rollup.json"
 PT_GETH_SNAPSHOT_URL="https://mainnet.patex.io/snapshots/mainnet.tar"
 
 # Helper method that waits for a given URL to be up. Can't use
@@ -59,10 +58,6 @@ mkdir -p ./.mainnet
 # Download genesis file if not exists
 if [ ! -f "$MAINNET/genesis.json" ]; then
   wget -O "$MAINNET"/genesis.json "$PT_GETH_GENESIS_URL"
-fi
-# Download rollup file if not exists
-if [ ! -f "$MAINNET/rollup.json" ]; then
-  wget -O "$MAINNET"/rollup.json "$PT_NODE_ROLLUP_URL"
 fi
 # Download snapshot file if not exists
 if [ ! -f "$MAINNET/mainnet.tar" ]; then

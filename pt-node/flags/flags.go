@@ -47,11 +47,13 @@ var (
 	RPCListenAddr = cli.StringFlag{
 		Name:   "rpc.addr",
 		Usage:  "RPC listening address",
+		Value:  "0.0.0.0",
 		EnvVar: prefixEnvVar("RPC_ADDR"),
 	}
 	RPCListenPort = cli.IntFlag{
 		Name:   "rpc.port",
 		Usage:  "RPC listening port",
+		Value:  8545,
 		EnvVar: prefixEnvVar("RPC_PORT"),
 	}
 	RPCEnableAdmin = cli.BoolFlag{
@@ -213,8 +215,6 @@ var (
 var requiredFlags = []cli.Flag{
 	L1NodeAddr,
 	L2EngineAddr,
-	RPCListenAddr,
-	RPCListenPort,
 }
 
 var optionalFlags = []cli.Flag{

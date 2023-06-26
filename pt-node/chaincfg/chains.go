@@ -75,8 +75,70 @@ var Goerli = rollup.Config{
 	RegolithTime:           u64Ptr(1679079600),
 }
 
+var PatexSepolia = rollup.Config{
+	Genesis: rollup.Genesis{
+		L1: eth.BlockID{
+			Hash:   common.HexToHash("0x42fb77897fbc2ce4fdbd4c3416da22efe6e0a306b20d9aaf5ed1e7d852a9fdff"),
+			Number: 3635475,
+		},
+		L2: eth.BlockID{
+			Hash:   common.HexToHash("0xbb78fd2ea1c0012fe6bdce3f1cdb60de0fc896fa87c9282d6de660a39107dff7"),
+			Number: 0,
+		},
+		L2Time: 1686058464,
+		SystemConfig: eth.SystemConfig{
+			BatcherAddr: common.HexToAddress("0x87c0da3a03218be364b89b460c1376752c5cec96"),
+			Overhead:    eth.Bytes32(common.HexToHash("0x0000000000000000000000000000000000000000000000000000000000000834")),
+			Scalar:      eth.Bytes32(common.HexToHash("0x00000000000000000000000000000000000000000000000000000000000f4240")),
+			GasLimit:    30_000_000,
+		},
+	},
+	BlockTime:              10,
+	MaxSequencerDrift:      600,
+	SeqWindowSize:          3600,
+	ChannelTimeout:         300,
+	L1ChainID:              big.NewInt(11155111),
+	L2ChainID:              big.NewInt(471100),
+	BatchInboxAddress:      common.HexToAddress("0xff00000000000000000000000000000000042069"),
+	DepositContractAddress: common.HexToAddress("0xd7400a9e3bd054264be87443939770dcf23e5b95"),
+	L1SystemConfigAddress:  common.HexToAddress("0x95eb0167854a4a342ae5b6636afa4015e13f67fd"),
+	RegolithTime:           u64Ptr(0),
+}
+
+var PatexMainnet = rollup.Config{
+	Genesis: rollup.Genesis{
+		L1: eth.BlockID{
+			Hash:   common.HexToHash("0x44b2078a814136a8af22c3135c88a7e2279c7dd0ff270ba538c776905a7b2594"),
+			Number: 17434125,
+		},
+		L2: eth.BlockID{
+			Hash:   common.HexToHash("0x37379affb896facb96f88ac39a1bc91ea312263df9b18dd3ec978dfa59fd48bb"),
+			Number: 0,
+		},
+		L2Time: 1686209495,
+		SystemConfig: eth.SystemConfig{
+			BatcherAddr: common.HexToAddress("0x6088b06c5a187058434655b71057a9ee93e13d0d"),
+			Overhead:    eth.Bytes32(common.HexToHash("0x00000000000000000000000000000000000000000000000000000000000000bc")),
+			Scalar:      eth.Bytes32(common.HexToHash("0x00000000000000000000000000000000000000000000000000000000000a6fe0")),
+			GasLimit:    30_000_000,
+		},
+	},
+	BlockTime:              10,
+	MaxSequencerDrift:      600,
+	SeqWindowSize:          3600,
+	ChannelTimeout:         300,
+	L1ChainID:              big.NewInt(1),
+	L2ChainID:              big.NewInt(789),
+	BatchInboxAddress:      common.HexToAddress("0xff00000000000000000000000000000000000010"),
+	DepositContractAddress: common.HexToAddress("0x0d6e11e2a3b2b3a245bf839c07d775983acb787d"),
+	L1SystemConfigAddress:  common.HexToAddress("0x04c9303d5727335d067e5085704976110f9f088e"),
+	RegolithTime:           u64Ptr(0),
+}
+
 var NetworksByName = map[string]rollup.Config{
-	"goerli": Goerli,
+	"goerli":        Goerli,
+	"patex-sepolia": PatexSepolia,
+	"patex-mainnet": PatexMainnet,
 	// moose: Update this during migration
 	// "mainnet": Mainnet,
 }
