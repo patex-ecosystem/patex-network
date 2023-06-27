@@ -225,17 +225,37 @@ func loadDiscoveryOpts(conf *p2p.Config, ctx *cli.Context) error {
 }
 
 func loadLibp2pOpts(conf *p2p.Config, ctx *cli.Context) error {
+
+	parseAddr := func(addrs []string) error {
+		for i, addr := range addrs {
+			addr = strings.TrimSpace(addr)
+			if addr == "" {
+				continue // skip empty multi addrs
+			}
+			a, err := multiaddr.NewMultiaddr(addr)
+			if err != nil {
+				return fmt.Errorf("failed to parse multi addr of static peer %d (out of %d): %q err: %w", i, len(addrs), addr, err)
+			}
+			conf.StaticPeers = append(conf.StaticPeers, a)
+		}
+		return nil
+	}
+
+	//Try set static peers from startup options
 	addrs := strings.Split(ctx.GlobalString(flags.StaticPeers.Name), ",")
-	for i, addr := range addrs {
-		addr = strings.TrimSpace(addr)
-		if addr == "" {
-			continue // skip empty multi addrs
+	err := parseAddr(addrs)
+
+	// Check if peers not filled then put from embedded static peers
+	if conf.StaticPeers == nil && ctx.IsSet(flags.Network.Name) {
+		switch ctx.GlobalString(flags.Network.Name) {
+		case "patex-mainnet":
+			err = parseAddr(p2p.PatexMainnetStaticPeers)
+		case "patex-sepolia":
+			err = parseAddr(p2p.PatexSepoliaStaticPeers)
 		}
-		a, err := multiaddr.NewMultiaddr(addr)
-		if err != nil {
-			return fmt.Errorf("failed to parse multi addr of static peer %d (out of %d): %q err: %w", i, len(addrs), addr, err)
-		}
-		conf.StaticPeers = append(conf.StaticPeers, a)
+	}
+	if err != nil {
+		return err
 	}
 
 	for _, v := range strings.Split(ctx.GlobalString(flags.HostMux.Name), ",") {
@@ -282,7 +302,6 @@ func loadLibp2pOpts(conf *p2p.Config, ctx *cli.Context) error {
 		return errors.New("peerstore path must be specified, use 'memory' to explicitly not persist peer records")
 	}
 
-	var err error
 	var store ds.Batching
 	if peerstorePath == "memory" {
 		store = sync.MutexWrap(ds.NewMapDatastore())

@@ -30,6 +30,22 @@ var DefaultBootnodes = []*enode.Node{
 	enode.MustParse("enode://9d7a3efefe442351217e73b3a593bcb8efffb55b4807699972145324eab5e6b382152f8d24f6301baebbfb5ecd4127bd3faab2842c04cd432bdf50ba092f6645@34.65.109.126:0?discport=30305"),
 }
 
+// PatexSepoliaStaticPeers are the multiaddress URLs of the P2P  nodes running on the
+// Patex Sepolia test network.
+var PatexSepoliaStaticPeers = []string{
+	"",
+	"",
+	"",
+}
+
+// PatexMainnetStaticPeers are the multiaddress URLs of the P2P  nodes running on the
+// Patex Mainnet network.
+var PatexMainnetStaticPeers = []string{
+	"/dns4/p2p.patex.io/tcp/9003/p2p/16Uiu2HAmAFAZiabLuxib2DtF4PQYpURgVXviW4XurBMC1cmAfGKf",
+	"/dns4/p2p.patex.io/tcp/9003/p2p/16Uiu2HAmQdiuEfCPd81hMddzFpU4zrjv8yEYatPw6JA2uqpBgYeQ",
+	"/dns4/p2p.patex.io/tcp/9003/p2p/16Uiu2HAm1h26yjHVpZzAt4isjkXHRiaVp4YoxP2URjnqVaoyrieS",
+}
+
 type HostMetrics interface {
 	gating.UnbanMetrics
 	gating.ConnectionGaterMetrics
