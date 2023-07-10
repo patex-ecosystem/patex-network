@@ -47,6 +47,7 @@ exec geth \
        --rollup.disabletxpoolgossip=true \
        --nodiscover \
        --syncmode=full \
+       --gcmode=archive \
        --maxpeers=0 \
        --datadir="$GETH_DATA_DIR" \
        --txlookuplimit=0 \
