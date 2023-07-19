@@ -50,8 +50,8 @@ services:
       --p2p.ban.peers=true
       --p2p.priv.path=/ptnode_p2p_priv.txt
       --rollup.config=/rollup.json
-      --l1=https://eth-sepolia.g.alchemy.com/v2/lFGZ4V41-wQcvFFQFuICucTHKOQ8GNjT
-      --l1.rpckind=alchemy
+      --l1=https://ethereum-sepolia-archive.allthatnode.com
+      --l1.rpckind=basic
     ports:
       - "17545:8545"
       - "19003:9003"
