@@ -224,8 +224,10 @@ batchLoop:
 	firstOfEpoch := epoch.Number == l2SafeHead.L1Origin.Number+1
 
 	bq.log.Trace("Potentially generating an empty batch",
-		"expiryEpoch", expiryEpoch, "forceEmptyBatches", forceEmptyBatches, "nextTimestamp", nextTimestamp,
-		"epoch_time", epoch.Time, "len_l1_blocks", len(bq.l1Blocks), "firstOfEpoch", firstOfEpoch)
+		"expiryEpoch", expiryEpoch, "epoch.Number", epoch.Number,
+		"forceEmptyBatches", forceEmptyBatches, "bq.origin.Number", bq.origin.Number, "outOfData", outOfData,
+		"nextTimestamp", nextTimestamp, "epoch_time", epoch.Time, "len_l1_blocks", len(bq.l1Blocks),
+		"firstOfEpoch", firstOfEpoch, "l2SafeHead.L1Origin.Number", l2SafeHead.L1Origin.Number)
 
 	if !forceEmptyBatches {
 		// sequence window did not expire yet, still room to receive batches for the current epoch,
