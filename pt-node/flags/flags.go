@@ -208,6 +208,13 @@ var (
 		EnvVar:   prefixEnvVar("L2_BACKUP_UNSAFE_SYNC_RPC_TRUST_RPC"),
 		Required: false,
 	}
+	L1BlockTime = cli.Uint64Flag{
+		Name:     "l1.blocktime",
+		Usage:    "L1 block production time. Default value is 12, like Ethereum block time",
+		EnvVar:   prefixEnvVar("L1_BLOCKTIME"),
+		Required: false,
+		Value:    12,
+	}
 )
 
 var requiredFlags = []cli.Flag{
@@ -245,6 +252,7 @@ var optionalFlags = []cli.Flag{
 	HeartbeatURLFlag,
 	BackupL2UnsafeSyncRPC,
 	BackupL2UnsafeSyncRPCTrustRPC,
+	L1BlockTime,
 }
 
 // Flags contains the list of configuration options available to the binary.
