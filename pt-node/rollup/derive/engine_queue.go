@@ -24,7 +24,7 @@ type attributesWithParent struct {
 
 type NextAttributesProvider interface {
 	Origin() eth.L1BlockRef
-	NextAttributes(context.Context, eth.L2BlockRef) (*eth.PayloadAttributes, error)
+	NextAttributes(context.Context, eth.L2BlockRef, eth.L2BlockRef) (*eth.PayloadAttributes, error)
 }
 
 type Engine interface {
@@ -240,7 +240,7 @@ func (eq *EngineQueue) Step(ctx context.Context) error {
 	if err := eq.tryFinalizePastL2Blocks(ctx); err != nil {
 		return err
 	}
-	if next, err := eq.prev.NextAttributes(ctx, eq.safeHead); err == io.EOF {
+	if next, err := eq.prev.NextAttributes(ctx, eq.safeHead, eq.unsafeHead); err == io.EOF {
 		outOfData = true
 	} else if err != nil {
 		return err

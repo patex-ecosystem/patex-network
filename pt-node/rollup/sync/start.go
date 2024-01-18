@@ -221,17 +221,17 @@ func FindL2Heads(ctx context.Context, cfg *rollup.Config, l1 L1Chain, l2 L2Chain
 		// Check the L1 origin relation
 		if parent.L1Origin != n.L1Origin {
 			// sanity check that the L1 origin block number is coherent
-			if parent.L1Origin.Number+1 != n.L1Origin.Number {
-				return nil, fmt.Errorf("l2 parent %s of %s has L1 origin %s that is not before %s", parent, n, parent.L1Origin, n.L1Origin)
-			}
+			//if parent.L1Origin.Number+1 != n.L1Origin.Number {
+			//	return nil, fmt.Errorf("l2 parent %s of %s has L1 origin %s that is not before %s", parent, n, parent.L1Origin, n.L1Origin)
+			//}
 			// sanity check that the later sequence number is 0, if it changed between the L2 blocks
 			if n.SequenceNumber != 0 {
 				return nil, fmt.Errorf("l2 block %s has parent %s with different L1 origin %s, but non-zero sequence number %d", n, parent, parent.L1Origin, n.SequenceNumber)
 			}
 			// if the L1 origin is known to be canonical, then the parent must be too
-			if l1Block.Hash == n.L1Origin.Hash && l1Block.ParentHash != parent.L1Origin.Hash {
-				return nil, fmt.Errorf("parent L2 block %s has origin %s but expected %s", parent, parent.L1Origin, l1Block.ParentHash)
-			}
+			//if l1Block.Hash == n.L1Origin.Hash && l1Block.ParentHash != parent.L1Origin.Hash {
+			//	return nil, fmt.Errorf("parent L2 block %s has origin %s but expected %s", parent, parent.L1Origin, l1Block.ParentHash)
+			//}
 		} else {
 			if parent.SequenceNumber+1 != n.SequenceNumber {
 				return nil, fmt.Errorf("sequence number inconsistency %d <> %d between l2 blocks %s and %s", parent.SequenceNumber, n.SequenceNumber, parent, n)

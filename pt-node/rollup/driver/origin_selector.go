@@ -55,7 +55,8 @@ func (los *L1OriginSelector) FindL1Origin(ctx context.Context, l2Head eth.L2Bloc
 	// Attempt to find the next L1 origin block, where the next origin is the immediate child of
 	// the current origin block.
 	// The L1 source can be shimmed to hide new L1 blocks and enforce a sequencer confirmation distance.
-	nextOrigin, err := los.l1.L1BlockRefByNumber(ctx, currentOrigin.Number+1)
+	epochesShift := rollup.EpochesShifts(12, los.cfg.BlockTime)
+	nextOrigin, err := los.l1.L1BlockRefByNumber(ctx, currentOrigin.Number+epochesShift)
 	if err != nil {
 		if pastSeqDrift {
 			return eth.L1BlockRef{}, fmt.Errorf("cannot build next L2 block past current L1 origin %s by more than sequencer time drift, and failed to find next L1 origin: %w", currentOrigin, err)

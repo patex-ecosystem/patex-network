@@ -322,4 +322,14 @@ func fmtTime(v uint64) string {
 	return time.Unix(int64(v), 0).Format(time.UnixDate)
 }
 
+func EpochesShifts(l1BlockTime uint64, l2BlockTime uint64) uint64 {
+	var nextCount uint64 = 1
+	temp := l2BlockTime
+	for temp >= l1BlockTime {
+		temp -= l1BlockTime
+		nextCount++
+	}
+	return nextCount
+}
+
 type Epoch uint64

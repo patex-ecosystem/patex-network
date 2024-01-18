@@ -108,7 +108,7 @@ func TestBatchQueueNewOrigin(t *testing.T) {
 
 	// Prev Origin: 0; Safehead Origin: 2; Internal Origin: 0
 	// Should return no data but keep the same origin
-	data, err := bq.NextBatch(context.Background(), safeHead)
+	data, err := bq.NextBatch(context.Background(), safeHead, eth.L2BlockRef{})
 	require.Nil(t, data)
 	require.Equal(t, io.EOF, err)
 	require.Equal(t, []eth.L1BlockRef{l1[0]}, bq.l1Blocks)
@@ -117,7 +117,7 @@ func TestBatchQueueNewOrigin(t *testing.T) {
 	// Prev Origin: 1; Safehead Origin: 2; Internal Origin: 0
 	// Should wipe l1blocks + advance internal origin
 	input.origin = l1[1]
-	data, err = bq.NextBatch(context.Background(), safeHead)
+	data, err = bq.NextBatch(context.Background(), safeHead, eth.L2BlockRef{})
 	require.Nil(t, data)
 	require.Equal(t, io.EOF, err)
 	require.Empty(t, bq.l1Blocks)
@@ -126,7 +126,7 @@ func TestBatchQueueNewOrigin(t *testing.T) {
 	// Prev Origin: 2; Safehead Origin: 2; Internal Origin: 1
 	// Should add to l1Blocks + advance internal origin
 	input.origin = l1[2]
-	data, err = bq.NextBatch(context.Background(), safeHead)
+	data, err = bq.NextBatch(context.Background(), safeHead, eth.L2BlockRef{})
 	require.Nil(t, data)
 	require.Equal(t, io.EOF, err)
 	require.Equal(t, []eth.L1BlockRef{l1[2]}, bq.l1Blocks)
@@ -170,7 +170,7 @@ func TestBatchQueueEager(t *testing.T) {
 	input.origin = l1[1]
 
 	for i := 0; i < len(batches); i++ {
-		b, e := bq.NextBatch(context.Background(), safeHead)
+		b, e := bq.NextBatch(context.Background(), safeHead, eth.L2BlockRef{})
 		require.ErrorIs(t, e, errors[i])
 		require.Equal(t, batches[i], b)
 
@@ -219,7 +219,7 @@ func TestBatchQueueInvalidInternalAdvance(t *testing.T) {
 
 	// Load continuous batches for epoch 0
 	for i := 0; i < len(batches); i++ {
-		b, e := bq.NextBatch(context.Background(), safeHead)
+		b, e := bq.NextBatch(context.Background(), safeHead, eth.L2BlockRef{})
 		require.ErrorIs(t, e, errors[i])
 		require.Equal(t, batches[i], b)
 
@@ -233,20 +233,20 @@ func TestBatchQueueInvalidInternalAdvance(t *testing.T) {
 
 	// Advance to origin 1. No forced batches yet.
 	input.origin = l1[1]
-	b, e := bq.NextBatch(context.Background(), safeHead)
+	b, e := bq.NextBatch(context.Background(), safeHead, eth.L2BlockRef{})
 	require.ErrorIs(t, e, io.EOF)
 	require.Nil(t, b)
 
 	// Advance to origin 2. No forced batches yet because we are still on epoch 0
 	// & have batches for epoch 0.
 	input.origin = l1[2]
-	b, e = bq.NextBatch(context.Background(), safeHead)
+	b, e = bq.NextBatch(context.Background(), safeHead, eth.L2BlockRef{})
 	require.ErrorIs(t, e, io.EOF)
 	require.Nil(t, b)
 
 	// Advance to origin 3. Should generate one empty batch.
 	input.origin = l1[3]
-	b, e = bq.NextBatch(context.Background(), safeHead)
+	b, e = bq.NextBatch(context.Background(), safeHead, eth.L2BlockRef{})
 	require.Nil(t, e)
 	require.NotNil(t, b)
 	require.Equal(t, safeHead.Time+2, b.Timestamp)
@@ -255,13 +255,13 @@ func TestBatchQueueInvalidInternalAdvance(t *testing.T) {
 	safeHead.Time += 2
 	safeHead.Hash = mockHash(b.Timestamp, 2)
 	safeHead.L1Origin = b.Epoch()
-	b, e = bq.NextBatch(context.Background(), safeHead)
+	b, e = bq.NextBatch(context.Background(), safeHead, eth.L2BlockRef{})
 	require.ErrorIs(t, e, io.EOF)
 	require.Nil(t, b)
 
 	// Advance to origin 4. Should generate one empty batch.
 	input.origin = l1[4]
-	b, e = bq.NextBatch(context.Background(), safeHead)
+	b, e = bq.NextBatch(context.Background(), safeHead, eth.L2BlockRef{})
 	require.Nil(t, e)
 	require.NotNil(t, b)
 	require.Equal(t, rollup.Epoch(2), b.EpochNum)
@@ -270,7 +270,7 @@ func TestBatchQueueInvalidInternalAdvance(t *testing.T) {
 	safeHead.Time += 2
 	safeHead.Hash = mockHash(b.Timestamp, 2)
 	safeHead.L1Origin = b.Epoch()
-	b, e = bq.NextBatch(context.Background(), safeHead)
+	b, e = bq.NextBatch(context.Background(), safeHead, eth.L2BlockRef{})
 	require.ErrorIs(t, e, io.EOF)
 	require.Nil(t, b)
 
@@ -312,7 +312,7 @@ func TestBatchQueueMissing(t *testing.T) {
 	_ = bq.Reset(context.Background(), l1[0], eth.SystemConfig{})
 
 	for i := 0; i < len(batches); i++ {
-		b, e := bq.NextBatch(context.Background(), safeHead)
+		b, e := bq.NextBatch(context.Background(), safeHead, eth.L2BlockRef{})
 		require.ErrorIs(t, e, NotEnoughData)
 		require.Nil(t, b)
 	}
@@ -320,7 +320,7 @@ func TestBatchQueueMissing(t *testing.T) {
 	// advance origin. Underlying stage still has no more batches
 	// This is not enough to auto advance yet
 	input.origin = l1[1]
-	b, e := bq.NextBatch(context.Background(), safeHead)
+	b, e := bq.NextBatch(context.Background(), safeHead, eth.L2BlockRef{})
 	require.ErrorIs(t, e, io.EOF)
 	require.Nil(t, b)
 
@@ -328,7 +328,7 @@ func TestBatchQueueMissing(t *testing.T) {
 	input.origin = l1[2]
 
 	// Check for a generated batch at t = 12
-	b, e = bq.NextBatch(context.Background(), safeHead)
+	b, e = bq.NextBatch(context.Background(), safeHead, eth.L2BlockRef{})
 	require.Nil(t, e)
 	require.Equal(t, b.Timestamp, uint64(12))
 	require.Empty(t, b.BatchV1.Transactions)
@@ -338,7 +338,7 @@ func TestBatchQueueMissing(t *testing.T) {
 	safeHead.Hash = mockHash(b.Timestamp, 2)
 
 	// Check for generated batch at t = 14
-	b, e = bq.NextBatch(context.Background(), safeHead)
+	b, e = bq.NextBatch(context.Background(), safeHead, eth.L2BlockRef{})
 	require.Nil(t, e)
 	require.Equal(t, b.Timestamp, uint64(14))
 	require.Empty(t, b.BatchV1.Transactions)
@@ -348,7 +348,7 @@ func TestBatchQueueMissing(t *testing.T) {
 	safeHead.Hash = mockHash(b.Timestamp, 2)
 
 	// Check for the inputted batch at t = 16
-	b, e = bq.NextBatch(context.Background(), safeHead)
+	b, e = bq.NextBatch(context.Background(), safeHead, eth.L2BlockRef{})
 	require.Nil(t, e)
 	require.Equal(t, b, batches[0])
 	require.Equal(t, rollup.Epoch(0), b.EpochNum)
@@ -362,9 +362,9 @@ func TestBatchQueueMissing(t *testing.T) {
 	// Check for the generated batch at t = 18. This batch advances the epoch
 	// Note: We need one io.EOF returned from the bq that advances the internal L1 Blocks view
 	// before the batch will be auto generated
-	_, e = bq.NextBatch(context.Background(), safeHead)
+	_, e = bq.NextBatch(context.Background(), safeHead, eth.L2BlockRef{})
 	require.Equal(t, e, io.EOF)
-	b, e = bq.NextBatch(context.Background(), safeHead)
+	b, e = bq.NextBatch(context.Background(), safeHead, eth.L2BlockRef{})
 	require.Nil(t, e)
 	require.Equal(t, b.Timestamp, uint64(18))
 	require.Empty(t, b.BatchV1.Transactions)

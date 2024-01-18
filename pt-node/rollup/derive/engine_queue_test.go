@@ -30,7 +30,7 @@ func (f *fakeAttributesQueue) Origin() eth.L1BlockRef {
 	return f.origin
 }
 
-func (f *fakeAttributesQueue) NextAttributes(_ context.Context, _ eth.L2BlockRef) (*eth.PayloadAttributes, error) {
+func (f *fakeAttributesQueue) NextAttributes(_ context.Context, _ eth.L2BlockRef, _ eth.L2BlockRef) (*eth.PayloadAttributes, error) {
 	if f.attrs == nil {
 		return nil, io.EOF
 	}

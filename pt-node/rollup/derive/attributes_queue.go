@@ -48,10 +48,10 @@ func (aq *AttributesQueue) Origin() eth.L1BlockRef {
 	return aq.prev.Origin()
 }
 
-func (aq *AttributesQueue) NextAttributes(ctx context.Context, l2SafeHead eth.L2BlockRef) (*eth.PayloadAttributes, error) {
+func (aq *AttributesQueue) NextAttributes(ctx context.Context, l2SafeHead eth.L2BlockRef, l2unsafeSafeHead eth.L2BlockRef) (*eth.PayloadAttributes, error) {
 	// Get a batch if we need it
 	if aq.batch == nil {
-		batch, err := aq.prev.NextBatch(ctx, l2SafeHead)
+		batch, err := aq.prev.NextBatch(ctx, l2SafeHead, l2unsafeSafeHead)
 		if err != nil {
 			return nil, err
 		}
@@ -73,9 +73,9 @@ func (aq *AttributesQueue) NextAttributes(ctx context.Context, l2SafeHead eth.L2
 // to the attributes transaction list
 func (aq *AttributesQueue) createNextAttributes(ctx context.Context, batch *BatchData, l2SafeHead eth.L2BlockRef) (*eth.PayloadAttributes, error) {
 	// sanity check parent hash
-	if batch.ParentHash != l2SafeHead.Hash {
+	/*if batch.ParentHash != l2SafeHead.Hash {
 		return nil, NewResetError(fmt.Errorf("valid batch has bad parent hash %s, expected %s", batch.ParentHash, l2SafeHead.Hash))
-	}
+	}*/
 	// sanity check timestamp
 	if expected := l2SafeHead.Time + aq.config.BlockTime; expected != batch.Timestamp {
 		return nil, NewResetError(fmt.Errorf("valid batch has bad timestamp %d, expected %d", batch.Timestamp, expected))

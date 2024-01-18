@@ -59,7 +59,7 @@ func (bq *BatchQueue) Origin() eth.L1BlockRef {
 	return bq.prev.Origin()
 }
 
-func (bq *BatchQueue) NextBatch(ctx context.Context, safeL2Head eth.L2BlockRef) (*BatchData, error) {
+func (bq *BatchQueue) NextBatch(ctx context.Context, safeL2Head eth.L2BlockRef, unsafeL2Head eth.L2BlockRef) (*BatchData, error) {
 	// Note: We use the origin that we will have to determine if it's behind. This is important
 	// because it's the future origin that gets saved into the l1Blocks array.
 	// We always update the origin of this stage if it is not the same so after the update code
@@ -103,7 +103,7 @@ func (bq *BatchQueue) NextBatch(ctx context.Context, safeL2Head eth.L2BlockRef) 
 	}
 
 	// Finally attempt to derive more batches
-	batch, err := bq.deriveNextBatch(ctx, outOfData, safeL2Head)
+	batch, err := bq.deriveNextBatch(ctx, outOfData, safeL2Head, unsafeL2Head)
 	if err == io.EOF && outOfData {
 		return nil, io.EOF
 	} else if err == io.EOF {
@@ -147,7 +147,7 @@ func (bq *BatchQueue) AddBatch(batch *BatchData, l2SafeHead eth.L2BlockRef) {
 // following the validity rules imposed on consecutive batches,
 // based on currently available buffered batch and L1 origin information.
 // If no batch can be derived yet, then (nil, io.EOF) is returned.
-func (bq *BatchQueue) deriveNextBatch(ctx context.Context, outOfData bool, l2SafeHead eth.L2BlockRef) (*BatchData, error) {
+func (bq *BatchQueue) deriveNextBatch(ctx context.Context, outOfData bool, l2SafeHead eth.L2BlockRef, l2UnSafeHead eth.L2BlockRef) (*BatchData, error) {
 	if len(bq.l1Blocks) == 0 {
 		return nil, NewCriticalError(errors.New("cannot derive next batch, no origin was prepared"))
 	}
@@ -157,9 +157,9 @@ func (bq *BatchQueue) deriveNextBatch(ctx context.Context, outOfData bool, l2Saf
 	// Note: epoch origin can now be one block ahead of the L2 Safe Head
 	// This is in the case where we auto generate all batches in an epoch & advance the epoch
 	// but don't advance the L2 Safe Head's epoch
-	if l2SafeHead.L1Origin != epoch.ID() && l2SafeHead.L1Origin.Number != epoch.Number-1 {
-		return nil, NewResetError(fmt.Errorf("buffered L1 chain epoch %s in batch queue does not match safe head origin %s", epoch, l2SafeHead.L1Origin))
-	}
+	//if l2SafeHead.L1Origin != epoch.ID() && l2SafeHead.L1Origin.Number != epoch.Number-1 {
+	//return nil, NewResetError(fmt.Errorf("buffered L1 chain epoch %s in batch queue does not match safe head origin %s", epoch, l2SafeHead.L1Origin))
+	//}
 
 	// Find the first-seen batch that matches all validity conditions.
 	// We may not have sufficient information to proceed filtering, and then we stop.
@@ -243,13 +243,13 @@ batchLoop:
 	// Fill with empty L2 blocks of the same epoch until we meet the time of the next L1 origin,
 	// to preserve that L2 time >= L1 time. If this is the first block of the epoch, always generate a
 	// batch to ensure that we at least have one batch per epoch.
-	if nextTimestamp < nextEpoch.Time || firstOfEpoch {
+	if nextTimestamp < nextEpoch.Time /*|| firstOfEpoch */ {
 		bq.log.Info("Generating next batch", "epoch", epoch, "timestamp", nextTimestamp)
 		return &BatchData{
 			BatchV1{
 				ParentHash:   l2SafeHead.Hash,
-				EpochNum:     rollup.Epoch(epoch.Number),
-				EpochHash:    epoch.Hash,
+				EpochNum:     rollup.Epoch(l2UnSafeHead.L1Origin.Number),
+				EpochHash:    l2UnSafeHead.L1Origin.Hash,
 				Timestamp:    nextTimestamp,
 				Transactions: nil,
 			},

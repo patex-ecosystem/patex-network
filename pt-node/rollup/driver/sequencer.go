@@ -70,10 +70,10 @@ func (d *Sequencer) StartBuildingBlock(ctx context.Context) error {
 		return err
 	}
 
-	if !(l2Head.L1Origin.Hash == l1Origin.ParentHash || l2Head.L1Origin.Hash == l1Origin.Hash) {
+	/*if !(l2Head.L1Origin.Hash == l1Origin.ParentHash || l2Head.L1Origin.Hash == l1Origin.Hash) {
 		d.metrics.RecordSequencerInconsistentL1Origin(l2Head.L1Origin, l1Origin.ID())
 		return derive.NewResetError(fmt.Errorf("cannot build new L2 block with L1 origin %s (parent L1 %s) on current L2 head %s with L1 origin %s", l1Origin, l1Origin.ParentHash, l2Head, l2Head.L1Origin))
-	}
+	}*/
 
 	d.log.Info("creating new block", "parent", l2Head, "l1Origin", l1Origin)
 

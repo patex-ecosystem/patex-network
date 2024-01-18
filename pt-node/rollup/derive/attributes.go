@@ -61,11 +61,12 @@ func (ba *FetchingAttributesBuilder) PreparePayloadAttributes(ctx context.Contex
 		if err != nil {
 			return nil, NewTemporaryError(fmt.Errorf("failed to fetch L1 block info and receipts: %w", err))
 		}
-		if l2Parent.L1Origin.Hash != info.ParentHash() {
+		//Parent check not actual for blocktime L2>L1, because queue switch few L1 epoches per one L2 block
+		/*if l2Parent.L1Origin.Hash != info.ParentHash() {
 			return nil, NewResetError(
 				fmt.Errorf("cannot create new block with L1 origin %s (parent %s) on top of L1 origin %s",
 					epoch, info.ParentHash(), l2Parent.L1Origin))
-		}
+		}*/
 
 		deposits, err := DeriveDeposits(receipts, ba.cfg.DepositContractAddress)
 		if err != nil {
@@ -95,10 +96,10 @@ func (ba *FetchingAttributesBuilder) PreparePayloadAttributes(ctx context.Contex
 
 	// Sanity check the L1 origin was correctly selected to maintain the time invariant between L1 and L2
 	nextL2Time := l2Parent.Time + ba.cfg.BlockTime
-	if nextL2Time < l1Info.Time() {
+	/*if nextL2Time < l1Info.Time() {
 		return nil, NewResetError(fmt.Errorf("cannot build L2 block on top %s for time %d before L1 origin %s at time %d",
 			l2Parent, nextL2Time, eth.ToBlockID(l1Info), l1Info.Time()))
-	}
+	}*/
 
 	l1InfoTx, err := L1InfoDepositBytes(seqNumber, l1Info, sysConfig, ba.cfg.IsRegolith(nextL2Time))
 	if err != nil {
