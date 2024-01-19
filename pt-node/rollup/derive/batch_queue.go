@@ -274,7 +274,7 @@ batchLoop:
 		}
 	} else {
 		if nextTimestamp < nextEpoch.Time {
-			bq.log.Info("Generating next batch", "epoch", epoch, "timestamp", nextTimestamp)
+			bq.log.Info("Generating next batch", "epoch (l2UnSafeHead.L1Origin)", l2UnSafeHead.L1Origin, "timestamp", nextTimestamp)
 			return &BatchData{
 				BatchV1{
 					ParentHash:   l2SafeHead.Hash,
