@@ -90,7 +90,23 @@ func (ba *FetchingAttributesBuilder) PreparePayloadAttributes(ctx context.Contex
 			return nil, NewTemporaryError(fmt.Errorf("failed to fetch L1 block info: %w", err))
 		}
 		l1Info = info
-		depositTxs = nil
+
+		//if blocktime l2 > l1 then fetch deposits every blocks
+		if ba.cfg.BlockTime > ba.cfg.L1BlockTime {
+			_, receipts, err := ba.l1.FetchReceipts(ctx, epoch.Hash)
+			if err != nil {
+				return nil, NewTemporaryError(fmt.Errorf("failed to fetch L1 block info and receipts: %w", err))
+			}
+			deposits, err := DeriveDeposits(receipts, ba.cfg.DepositContractAddress)
+			if err != nil {
+				// deposits may never be ignored. Failing to process them is a critical error.
+				return nil, NewCriticalError(fmt.Errorf("failed to derive some deposits: %w", err))
+			}
+			depositTxs = deposits
+		} else {
+			depositTxs = nil
+		}
+
 		seqNumber = l2Parent.SequenceNumber + 1
 	}
 
