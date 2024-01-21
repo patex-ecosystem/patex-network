@@ -93,3 +93,25 @@ func (los *L1OriginSelector) FindL1Origin(ctx context.Context, l2Head eth.L2Bloc
 
 	return currentOrigin, nil, nil
 }
+
+func (los *L1OriginSelector) FindShiftedL1Origins(ctx context.Context, epoch eth.BlockID) ([]eth.L1BlockRef, error) {
+
+	epochesShift := rollup.EpochesShifts(los.cfg.L1BlockTime, los.cfg.BlockTime)
+	if los.cfg.BlockTime >= los.cfg.L1BlockTime {
+		//Fetch shifted l1Origins for deriving deposits
+		var shiftedOrigins []eth.L1BlockRef
+		i := epochesShift
+		i--
+		for i > 0 {
+			l1blkRef, err := los.l1.L1BlockRefByNumber(ctx, epoch.Number-i)
+			if err != nil {
+				return []eth.L1BlockRef{}, fmt.Errorf("cannot to get shifted L1 origins by number %s error: %w", epoch, err)
+			}
+			shiftedOrigins = append(shiftedOrigins, l1blkRef)
+			i--
+		}
+		return shiftedOrigins, nil
+	}
+
+	return nil, nil
+}

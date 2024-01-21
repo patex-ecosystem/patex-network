@@ -24,7 +24,7 @@ import (
 // This stage does not need to retain any references to L1 blocks.
 
 type L1OriginSelectorIface interface {
-	FindL1Origin(ctx context.Context, l2Head eth.L2BlockRef) (eth.L1BlockRef, []eth.L1BlockRef, error)
+	FindShiftedL1Origins(ctx context.Context, epoch eth.BlockID) ([]eth.L1BlockRef, error)
 }
 
 type AttributesBuilder interface {
@@ -91,7 +91,7 @@ func (aq *AttributesQueue) createNextAttributes(ctx context.Context, batch *Batc
 
 	var shiftedEpoches []eth.L1BlockRef
 	if aq.l1OriginSelector != nil {
-		_, shEpch, err := aq.l1OriginSelector.FindL1Origin(ctx, l2SafeHead)
+		shEpch, err := aq.l1OriginSelector.FindShiftedL1Origins(ctx, batch.Epoch())
 		if err != nil {
 			return nil, NewResetError(fmt.Errorf("error fetching shifted L1 Origins %s", err))
 		}
