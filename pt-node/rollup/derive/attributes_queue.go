@@ -23,24 +23,30 @@ import (
 // This stage can be reset by clearing its batch buffer.
 // This stage does not need to retain any references to L1 blocks.
 
+type L1OriginSelectorIface interface {
+	FindL1Origin(ctx context.Context, l2Head eth.L2BlockRef) (eth.L1BlockRef, []eth.L1BlockRef, error)
+}
+
 type AttributesBuilder interface {
 	PreparePayloadAttributes(ctx context.Context, l2Parent eth.L2BlockRef, epoch eth.BlockID, shiftedEpoches []eth.L1BlockRef) (attrs *eth.PayloadAttributes, err error)
 }
 
 type AttributesQueue struct {
-	log     log.Logger
-	config  *rollup.Config
-	builder AttributesBuilder
-	prev    *BatchQueue
-	batch   *BatchData
+	log              log.Logger
+	config           *rollup.Config
+	builder          AttributesBuilder
+	prev             *BatchQueue
+	batch            *BatchData
+	l1OriginSelector L1OriginSelectorIface
 }
 
-func NewAttributesQueue(log log.Logger, cfg *rollup.Config, builder AttributesBuilder, prev *BatchQueue) *AttributesQueue {
+func NewAttributesQueue(log log.Logger, cfg *rollup.Config, builder AttributesBuilder, prev *BatchQueue, l1OriginSelector L1OriginSelectorIface) *AttributesQueue {
 	return &AttributesQueue{
-		log:     log,
-		config:  cfg,
-		builder: builder,
-		prev:    prev,
+		log:              log,
+		config:           cfg,
+		builder:          builder,
+		prev:             prev,
+		l1OriginSelector: l1OriginSelector,
 	}
 }
 
@@ -82,7 +88,16 @@ func (aq *AttributesQueue) createNextAttributes(ctx context.Context, batch *Batc
 	}
 	fetchCtx, cancel := context.WithTimeout(ctx, 20*time.Second)
 	defer cancel()
-	attrs, err := aq.builder.PreparePayloadAttributes(fetchCtx, l2SafeHead, batch.Epoch(), nil)
+
+	var shiftedEpoches []eth.L1BlockRef
+	if aq.l1OriginSelector != nil {
+		_, shEpch, err := aq.l1OriginSelector.FindL1Origin(ctx, l2SafeHead)
+		if err != nil {
+			return nil, NewResetError(fmt.Errorf("error fetching shifted L1 Origins %s", err))
+		}
+		shiftedEpoches = shEpch
+	}
+	attrs, err := aq.builder.PreparePayloadAttributes(fetchCtx, l2SafeHead, batch.Epoch(), shiftedEpoches)
 	if err != nil {
 		return nil, err
 	}
