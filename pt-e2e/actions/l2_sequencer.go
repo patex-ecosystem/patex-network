@@ -20,9 +20,9 @@ type MockL1OriginSelector struct {
 	originOverride eth.L1BlockRef // override which origin gets picked
 }
 
-func (m *MockL1OriginSelector) FindL1Origin(ctx context.Context, l2Head eth.L2BlockRef) (eth.L1BlockRef, error) {
+func (m *MockL1OriginSelector) FindL1Origin(ctx context.Context, l2Head eth.L2BlockRef) (eth.L1BlockRef, []eth.L1BlockRef, error) {
 	if m.originOverride != (eth.L1BlockRef{}) {
-		return m.originOverride, nil
+		return m.originOverride, nil, nil
 	}
 	return m.actual.FindL1Origin(ctx, l2Head)
 }
@@ -132,7 +132,7 @@ func (s *L2Sequencer) ActBuildToL1HeadUnsafe(t Testing) {
 func (s *L2Sequencer) ActBuildToL1HeadExcl(t Testing) {
 	for {
 		s.ActL2PipelineFull(t)
-		nextOrigin, err := s.mockL1OriginSelector.FindL1Origin(t.Ctx(), s.derivation.UnsafeL2Head())
+		nextOrigin, _, err := s.mockL1OriginSelector.FindL1Origin(t.Ctx(), s.derivation.UnsafeL2Head())
 		require.NoError(t, err)
 		if nextOrigin.Number >= s.l1State.L1Head().Number {
 			break
@@ -146,7 +146,7 @@ func (s *L2Sequencer) ActBuildToL1HeadExcl(t Testing) {
 func (s *L2Sequencer) ActBuildToL1HeadExclUnsafe(t Testing) {
 	for {
 		// Note: the derivation pipeline does not run, we are just sequencing a block on top of the existing L2 chain.
-		nextOrigin, err := s.mockL1OriginSelector.FindL1Origin(t.Ctx(), s.derivation.UnsafeL2Head())
+		nextOrigin, _, err := s.mockL1OriginSelector.FindL1Origin(t.Ctx(), s.derivation.UnsafeL2Head())
 		require.NoError(t, err)
 		if nextOrigin.Number >= s.l1State.L1Head().Number {
 			break

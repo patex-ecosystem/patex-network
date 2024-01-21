@@ -43,7 +43,7 @@ func NewFetchingAttributesBuilder(cfg *rollup.Config, l1 L1ReceiptsFetcher, l2 S
 // by setting NoTxPool=false as sequencer, or by appending batch transactions as verifier.
 // The severity of the error is returned; a crit=false error means there was a temporary issue, like a failed RPC or time-out.
 // A crit=true error means the input arguments are inconsistent or invalid.
-func (ba *FetchingAttributesBuilder) PreparePayloadAttributes(ctx context.Context, l2Parent eth.L2BlockRef, epoch eth.BlockID) (attrs *eth.PayloadAttributes, err error) {
+func (ba *FetchingAttributesBuilder) PreparePayloadAttributes(ctx context.Context, l2Parent eth.L2BlockRef, epoch eth.BlockID, shiftedEpoches []eth.L1BlockRef) (attrs *eth.PayloadAttributes, err error) {
 	var l1Info eth.BlockInfo
 	var depositTxs []hexutil.Bytes
 	var seqNumber uint64
@@ -57,10 +57,21 @@ func (ba *FetchingAttributesBuilder) PreparePayloadAttributes(ctx context.Contex
 	// case we need to fetch all transaction receipts from the L1 origin block so we can scan for
 	// user deposits.
 	if l2Parent.L1Origin.Number != epoch.Number {
+		// fetching receipts from current epoch
 		info, receipts, err := ba.l1.FetchReceipts(ctx, epoch.Hash)
 		if err != nil {
 			return nil, NewTemporaryError(fmt.Errorf("failed to fetch L1 block info and receipts: %w", err))
 		}
+
+		// fetching receipts from shifted epoches
+		for _, shiftEpoch := range shiftedEpoches {
+			_, shiftReceipts, err := ba.l1.FetchReceipts(ctx, shiftEpoch.Hash)
+			if err != nil {
+				return nil, NewTemporaryError(fmt.Errorf("failed to fetch L1 block info and receipts: %w", err))
+			}
+			receipts = append(receipts, shiftReceipts...)
+		}
+
 		//Parent check not actual for blocktime L2>L1, because queue switch few L1 epoches per one L2 block
 		/*if l2Parent.L1Origin.Hash != info.ParentHash() {
 			return nil, NewResetError(
@@ -91,11 +102,20 @@ func (ba *FetchingAttributesBuilder) PreparePayloadAttributes(ctx context.Contex
 		}
 		l1Info = info
 
-		//if blocktime l2 > l1 then fetch deposits every blocks
-		if ba.cfg.BlockTime > ba.cfg.L1BlockTime {
+		//if blocktime l2 >= l1 then fetch deposits every blocks
+		if ba.cfg.BlockTime >= ba.cfg.L1BlockTime {
+
 			_, receipts, err := ba.l1.FetchReceipts(ctx, epoch.Hash)
 			if err != nil {
 				return nil, NewTemporaryError(fmt.Errorf("failed to fetch L1 block info and receipts: %w", err))
+			}
+			// fetching receipts from shifted epoches
+			for _, shiftEpoch := range shiftedEpoches {
+				_, shiftReceipts, err := ba.l1.FetchReceipts(ctx, shiftEpoch.Hash)
+				if err != nil {
+					return nil, NewTemporaryError(fmt.Errorf("failed to fetch L1 block info and receipts: %w", err))
+				}
+				receipts = append(receipts, shiftReceipts...)
 			}
 			deposits, err := DeriveDeposits(receipts, ba.cfg.DepositContractAddress)
 			if err != nil {

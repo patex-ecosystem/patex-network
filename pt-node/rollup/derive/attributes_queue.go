@@ -24,7 +24,7 @@ import (
 // This stage does not need to retain any references to L1 blocks.
 
 type AttributesBuilder interface {
-	PreparePayloadAttributes(ctx context.Context, l2Parent eth.L2BlockRef, epoch eth.BlockID) (attrs *eth.PayloadAttributes, err error)
+	PreparePayloadAttributes(ctx context.Context, l2Parent eth.L2BlockRef, epoch eth.BlockID, shiftedEpoches []eth.L1BlockRef) (attrs *eth.PayloadAttributes, err error)
 }
 
 type AttributesQueue struct {
@@ -82,7 +82,7 @@ func (aq *AttributesQueue) createNextAttributes(ctx context.Context, batch *Batc
 	}
 	fetchCtx, cancel := context.WithTimeout(ctx, 20*time.Second)
 	defer cancel()
-	attrs, err := aq.builder.PreparePayloadAttributes(fetchCtx, l2SafeHead, batch.Epoch())
+	attrs, err := aq.builder.PreparePayloadAttributes(fetchCtx, l2SafeHead, batch.Epoch(), nil)
 	if err != nil {
 		return nil, err
 	}

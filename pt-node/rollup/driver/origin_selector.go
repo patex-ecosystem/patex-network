@@ -36,11 +36,11 @@ func NewL1OriginSelector(log log.Logger, cfg *rollup.Config, l1 L1Blocks) *L1Ori
 // FindL1Origin determines what the next L1 Origin should be.
 // The L1 Origin is either the L2 Head's Origin, or the following L1 block
 // if the next L2 block's time is greater than or equal to the L2 Head's Origin.
-func (los *L1OriginSelector) FindL1Origin(ctx context.Context, l2Head eth.L2BlockRef) (eth.L1BlockRef, error) {
+func (los *L1OriginSelector) FindL1Origin(ctx context.Context, l2Head eth.L2BlockRef) (eth.L1BlockRef, []eth.L1BlockRef, error) {
 	// Grab a reference to the current L1 origin block. This call is by hash and thus easily cached.
 	currentOrigin, err := los.l1.L1BlockRefByHash(ctx, l2Head.L1Origin.Hash)
 	if err != nil {
-		return eth.L1BlockRef{}, err
+		return eth.L1BlockRef{}, []eth.L1BlockRef{}, err
 	}
 	log := los.log.New("current", currentOrigin, "current_time", currentOrigin.Time,
 		"l2_head", l2Head, "l2_head_time", l2Head.Time)
@@ -55,18 +55,18 @@ func (los *L1OriginSelector) FindL1Origin(ctx context.Context, l2Head eth.L2Bloc
 	// Attempt to find the next L1 origin block, where the next origin is the immediate child of
 	// the current origin block.
 	// The L1 source can be shimmed to hide new L1 blocks and enforce a sequencer confirmation distance.
-	epochesShift := rollup.EpochesShifts(12, los.cfg.BlockTime)
+	epochesShift := rollup.EpochesShifts(los.cfg.L1BlockTime, los.cfg.BlockTime)
 	nextOrigin, err := los.l1.L1BlockRefByNumber(ctx, currentOrigin.Number+epochesShift)
 	if err != nil {
 		if pastSeqDrift {
-			return eth.L1BlockRef{}, fmt.Errorf("cannot build next L2 block past current L1 origin %s by more than sequencer time drift, and failed to find next L1 origin: %w", currentOrigin, err)
+			return eth.L1BlockRef{}, []eth.L1BlockRef{}, fmt.Errorf("cannot build next L2 block past current L1 origin %s by more than sequencer time drift, and failed to find next L1 origin: %w", currentOrigin, err)
 		}
 		if errors.Is(err, ethereum.NotFound) {
 			log.Debug("No next L1 block found, repeating current origin")
 		} else {
 			log.Error("Failed to get next origin. Falling back to current origin", "err", err)
 		}
-		return currentOrigin, nil
+		return currentOrigin, nil, nil
 	}
 
 	// If the next L2 block time is greater than the next origin block's time, we can choose to
@@ -75,8 +75,21 @@ func (los *L1OriginSelector) FindL1Origin(ctx context.Context, l2Head eth.L2Bloc
 	// of slack. For simplicity, we implement our Sequencer to always start building on the latest
 	// L1 block when we can.
 	if l2Head.Time+los.cfg.BlockTime >= nextOrigin.Time {
-		return nextOrigin, nil
+		//Fetch shifted l1Origins for deriving deposits
+		var shiftedOrigins []eth.L1BlockRef
+		i := epochesShift
+		i--
+		for i > 0 {
+			l1blkRef, err := los.l1.L1BlockRefByNumber(ctx, nextOrigin.Number-i)
+			if err != nil {
+				return eth.L1BlockRef{}, []eth.L1BlockRef{}, fmt.Errorf("cannot to get shifted L1 origin by number %d error: %w", nextOrigin.Number-i, err)
+			}
+			shiftedOrigins = append(shiftedOrigins, l1blkRef)
+			i--
+		}
+
+		return nextOrigin, shiftedOrigins, nil
 	}
 
-	return currentOrigin, nil
+	return currentOrigin, nil, nil
 }

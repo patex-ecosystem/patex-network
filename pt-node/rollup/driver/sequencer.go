@@ -21,7 +21,7 @@ type Downloader interface {
 }
 
 type L1OriginSelectorIface interface {
-	FindL1Origin(ctx context.Context, l2Head eth.L2BlockRef) (eth.L1BlockRef, error)
+	FindL1Origin(ctx context.Context, l2Head eth.L2BlockRef) (eth.L1BlockRef, []eth.L1BlockRef, error)
 }
 
 type SequencerMetrics interface {
@@ -64,7 +64,7 @@ func (d *Sequencer) StartBuildingBlock(ctx context.Context) error {
 	l2Head := d.engine.UnsafeL2Head()
 
 	// Figure out which L1 origin block we're going to be building on top of.
-	l1Origin, err := d.l1OriginSelector.FindL1Origin(ctx, l2Head)
+	l1Origin, shiftedEpoches, err := d.l1OriginSelector.FindL1Origin(ctx, l2Head)
 	if err != nil {
 		d.log.Error("Error finding next L1 Origin", "err", err)
 		return err
@@ -80,7 +80,7 @@ func (d *Sequencer) StartBuildingBlock(ctx context.Context) error {
 	fetchCtx, cancel := context.WithTimeout(ctx, time.Second*20)
 	defer cancel()
 
-	attrs, err := d.attrBuilder.PreparePayloadAttributes(fetchCtx, l2Head, l1Origin.ID())
+	attrs, err := d.attrBuilder.PreparePayloadAttributes(fetchCtx, l2Head, l1Origin.ID(), shiftedEpoches)
 	if err != nil {
 		return err
 	}

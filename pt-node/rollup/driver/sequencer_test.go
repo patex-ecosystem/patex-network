@@ -131,10 +131,10 @@ func (m *FakeEngineControl) Reset() {
 
 var _ derive.ResettableEngineControl = (*FakeEngineControl)(nil)
 
-type testAttrBuilderFn func(ctx context.Context, l2Parent eth.L2BlockRef, epoch eth.BlockID) (attrs *eth.PayloadAttributes, err error)
+type testAttrBuilderFn func(ctx context.Context, l2Parent eth.L2BlockRef, epoch eth.BlockID, shiftedEpoches []eth.L1BlockRef) (attrs *eth.PayloadAttributes, err error)
 
-func (fn testAttrBuilderFn) PreparePayloadAttributes(ctx context.Context, l2Parent eth.L2BlockRef, epoch eth.BlockID) (attrs *eth.PayloadAttributes, err error) {
-	return fn(ctx, l2Parent, epoch)
+func (fn testAttrBuilderFn) PreparePayloadAttributes(ctx context.Context, l2Parent eth.L2BlockRef, epoch eth.BlockID, shiftedEpoches []eth.L1BlockRef) (attrs *eth.PayloadAttributes, err error) {
+	return fn(ctx, l2Parent, epoch, shiftedEpoches)
 }
 
 var _ derive.AttributesBuilder = (testAttrBuilderFn)(nil)
