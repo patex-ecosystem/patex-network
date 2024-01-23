@@ -201,6 +201,7 @@ func TestBatchQueueInvalidInternalAdvance(t *testing.T) {
 			L2Time: 10,
 		},
 		BlockTime:         2,
+		L1BlockTime:       12,
 		MaxSequencerDrift: 600,
 		SeqWindowSize:     2,
 	}
@@ -294,6 +295,7 @@ func TestBatchQueueMissing(t *testing.T) {
 		BlockTime:         2,
 		MaxSequencerDrift: 600,
 		SeqWindowSize:     2,
+		L1BlockTime:       12,
 	}
 
 	// The batches at 18 and 20 are skipped to stop 22 from being eagerly processed.

@@ -48,7 +48,7 @@ func TestOriginSelectorAdvances(t *testing.T) {
 	l1.ExpectL1BlockRefByNumber(b.Number, b, nil)
 
 	s := NewL1OriginSelector(log, cfg, l1)
-	next, err := s.FindL1Origin(context.Background(), l2Head)
+	next, _, err := s.FindL1Origin(context.Background(), l2Head)
 	require.Nil(t, err)
 	require.Equal(t, b, next)
 }
@@ -89,7 +89,7 @@ func TestOriginSelectorRespectsOriginTiming(t *testing.T) {
 	l1.ExpectL1BlockRefByNumber(b.Number, b, nil)
 
 	s := NewL1OriginSelector(log, cfg, l1)
-	next, err := s.FindL1Origin(context.Background(), l2Head)
+	next, _, err := s.FindL1Origin(context.Background(), l2Head)
 	require.Nil(t, err)
 	require.Equal(t, a, next)
 }
@@ -129,7 +129,7 @@ func TestOriginSelectorRespectsConfDepth(t *testing.T) {
 	confDepthL1 := NewConfDepth(10, func() eth.L1BlockRef { return b }, l1)
 	s := NewL1OriginSelector(log, cfg, confDepthL1)
 
-	next, err := s.FindL1Origin(context.Background(), l2Head)
+	next, _, err := s.FindL1Origin(context.Background(), l2Head)
 	require.Nil(t, err)
 	require.Equal(t, a, next)
 }
@@ -172,7 +172,7 @@ func TestOriginSelectorStrictConfDepth(t *testing.T) {
 	confDepthL1 := NewConfDepth(10, func() eth.L1BlockRef { return b }, l1)
 	s := NewL1OriginSelector(log, cfg, confDepthL1)
 
-	_, err := s.FindL1Origin(context.Background(), l2Head)
+	_, _, err := s.FindL1Origin(context.Background(), l2Head)
 	require.ErrorContains(t, err, "sequencer time drift")
 }
 
@@ -210,7 +210,7 @@ func TestOriginSelectorSeqDriftRespectsNextOriginTime(t *testing.T) {
 	l1.ExpectL1BlockRefByNumber(b.Number, b, nil)
 
 	s := NewL1OriginSelector(log, cfg, l1)
-	next, err := s.FindL1Origin(context.Background(), l2Head)
+	next, _, err := s.FindL1Origin(context.Background(), l2Head)
 	require.Nil(t, err)
 	require.Equal(t, a, next)
 }
@@ -270,15 +270,15 @@ func TestOriginSelectorHandlesLateL1Blocks(t *testing.T) {
 	confDepthL1 := NewConfDepth(2, func() eth.L1BlockRef { return l1Head }, l1)
 	s := NewL1OriginSelector(log, cfg, confDepthL1)
 
-	_, err := s.FindL1Origin(context.Background(), l2Head)
+	_, _, err := s.FindL1Origin(context.Background(), l2Head)
 	require.ErrorContains(t, err, "sequencer time drift")
 
 	l1Head = c
-	_, err = s.FindL1Origin(context.Background(), l2Head)
+	_, _, err = s.FindL1Origin(context.Background(), l2Head)
 	require.ErrorContains(t, err, "sequencer time drift")
 
 	l1Head = d
-	next, err := s.FindL1Origin(context.Background(), l2Head)
+	next, _, err := s.FindL1Origin(context.Background(), l2Head)
 	require.Nil(t, err)
 	require.Equal(t, a, next, "must stay on a because the L1 time may not be higher than the L2 time")
 }

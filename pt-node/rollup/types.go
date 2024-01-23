@@ -326,6 +326,9 @@ func fmtTime(v uint64) string {
 
 func EpochesShifts(l1BlockTime uint64, l2BlockTime uint64) uint64 {
 	var nextCount uint64 = 1
+	if l1BlockTime == 0 {
+		return nextCount
+	}
 	temp := l2BlockTime
 	for temp >= l1BlockTime {
 		temp -= l1BlockTime

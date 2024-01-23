@@ -139,9 +139,9 @@ func (fn testAttrBuilderFn) PreparePayloadAttributes(ctx context.Context, l2Pare
 
 var _ derive.AttributesBuilder = (testAttrBuilderFn)(nil)
 
-type testOriginSelectorFn func(ctx context.Context, l2Head eth.L2BlockRef) (eth.L1BlockRef, error)
+type testOriginSelectorFn func(ctx context.Context, l2Head eth.L2BlockRef) (eth.L1BlockRef, []eth.L1BlockRef, error)
 
-func (fn testOriginSelectorFn) FindL1Origin(ctx context.Context, l2Head eth.L2BlockRef) (eth.L1BlockRef, error) {
+func (fn testOriginSelectorFn) FindL1Origin(ctx context.Context, l2Head eth.L2BlockRef) (eth.L1BlockRef, []eth.L1BlockRef, error) {
 	return fn(ctx, l2Head)
 }
 
@@ -233,7 +233,7 @@ func TestSequencerChaosMonkey(t *testing.T) {
 	// We keep attribute building simple, we don't talk to a real execution engine in this test.
 	// Sometimes we fake an error in the attributes preparation.
 	var attrsErr error
-	attrBuilder := testAttrBuilderFn(func(ctx context.Context, l2Parent eth.L2BlockRef, epoch eth.BlockID) (attrs *eth.PayloadAttributes, err error) {
+	attrBuilder := testAttrBuilderFn(func(ctx context.Context, l2Parent eth.L2BlockRef, epoch eth.BlockID, shiftedEpoches []eth.L1BlockRef) (attrs *eth.PayloadAttributes, err error) {
 		if attrsErr != nil {
 			return nil, attrsErr
 		}
@@ -269,9 +269,9 @@ func TestSequencerChaosMonkey(t *testing.T) {
 	maxL1BlockTimeGap := uint64(100)
 	// The origin selector just generates random L1 blocks based on RNG
 	var originErr error
-	originSelector := testOriginSelectorFn(func(ctx context.Context, l2Head eth.L2BlockRef) (eth.L1BlockRef, error) {
+	originSelector := testOriginSelectorFn(func(ctx context.Context, l2Head eth.L2BlockRef) (eth.L1BlockRef, []eth.L1BlockRef, error) {
 		if originErr != nil {
-			return eth.L1BlockRef{}, originErr
+			return eth.L1BlockRef{}, nil, originErr
 		}
 		origin := eth.L1BlockRef{
 			Hash:       mockL1Hash(l2Head.L1Origin.Number),
@@ -282,7 +282,7 @@ func TestSequencerChaosMonkey(t *testing.T) {
 		// randomly make a L1 origin appear, if we can even select it
 		nextL2Time := l2Head.Time + cfg.BlockTime
 		if nextL2Time <= origin.Time {
-			return origin, nil
+			return origin, nil, nil
 		}
 		maxTimeIncrement := nextL2Time - origin.Time
 		if maxTimeIncrement > maxL1BlockTimeGap {
@@ -296,9 +296,9 @@ func TestSequencerChaosMonkey(t *testing.T) {
 				Time:       origin.Time + 1 + uint64(rng.Int63n(int64(maxTimeIncrement))),
 			}
 			l1Times[nextOrigin.ID()] = nextOrigin.Time
-			return nextOrigin, nil
+			return nextOrigin, nil, nil
 		} else {
-			return origin, nil
+			return origin, nil, nil
 		}
 	})
 
