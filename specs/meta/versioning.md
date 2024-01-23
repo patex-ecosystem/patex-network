@@ -19,7 +19,6 @@
 ./pt-batcher
 ./pt-node
 ./pt-proposer
-./pt-e2e
 ```
 
 ### versioning process

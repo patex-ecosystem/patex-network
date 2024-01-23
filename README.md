@@ -56,7 +56,6 @@ Bounty hunters are encouraged to check out [our Immunefi bug bounty program](htt
 │   └── <a href="https://github.com/patex-ecosystem/contracts-bedrock">contracts-bedrock</a>: Bedrock smart contracts. To be merged with ./packages/contracts.
 ├── <a href="./pt-bindings">pt-bindings</a>: Go bindings for Bedrock smart contracts.
 ├── <a href="./pt-batcher">pt-batcher</a>: L2-Batch Submitter, submits bundles of batches to L1
-├── <a href="./pt-e2e">pt-e2e</a>: End-to-End testing of all bedrock components in Go
 ├── <a href="./pt-node">pt-node</a>: rollup consensus-layer client.
 ├── <a href="./pt-proposer">pt-proposer</a>: L2-Output Submitter, submits proposals to L1
 ├── <a href="./ops-bedrock">ops-bedrock</a>: Bedrock devnet work

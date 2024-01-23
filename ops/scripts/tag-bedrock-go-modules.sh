@@ -75,17 +75,3 @@ git commit -am 'chore: Upgrade pt-batcher dependencies'
 git push $BEDROCK_TAGS_REMOTE
 git tag "pt-batcher/$VERSION"
 git push $BEDROCK_TAGS_REMOTE "pt-batcher/$VERSION"
-
-cd ../pt-e2e
-go get github.com/patex-ecosystem/patex-network/pt-bindings@$VERSION
-go get github.com/patex-ecosystem/patex-network/pt-service@$VERSION
-go get github.com/patex-ecosystem/patex-network/pt-node@$VERSION
-go get github.com/patex-ecosystem/patex-network/pt-proposer@$VERSION
-go get github.com/patex-ecosystem/patex-network/pt-batcher@$VERSION
-go mod tidy
-
-git add .
-git commit -am 'chore: Upgrade pt-e2e dependencies'
-git push $BEDROCK_TAGS_REMOTE
-git tag "pt-e2e/$VERSION"
-git push $BEDROCK_TAGS_REMOTE "pt-e2e/$VERSION"
