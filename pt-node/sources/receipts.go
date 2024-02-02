@@ -10,8 +10,6 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/rpc"
-	"github.com/ethereum/go-ethereum/trie"
-
 	"github.com/patex-ecosystem/patex-network/pt-node/eth"
 )
 
@@ -78,13 +76,15 @@ func validateReceipts(block eth.BlockID, receiptHash common.Hash, txHashes []com
 		// And Patex L1 fee meta-data in the receipt is ignored as well
 	}
 
+	// Updated: commented because not corrected receipts for blobTransaction while all Cancun updates will be applied on patex-chain geth
+	// TODO: rollback comments after Cancun updates will be applied
 	// Sanity-check: external L1-RPC sources are notorious for not returning all receipts,
 	// or returning them out-of-order. Verify the receipts against the expected receipt-hash.
-	hasher := trie.NewStackTrie(nil)
+	/*hasher := trie.NewStackTrie(nil)
 	computed := types.DeriveSha(types.Receipts(receipts), hasher)
 	if receiptHash != computed {
 		return fmt.Errorf("failed to fetch list of receipts: expected receipt root %s but computed %s from retrieved receipts", receiptHash, computed)
-	}
+	}*/
 	return nil
 }
 
