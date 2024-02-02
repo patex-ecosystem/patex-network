@@ -173,6 +173,6 @@ require (
 	nhooyr.io/websocket v1.8.7 // indirect
 )
 
-replace github.com/ethereum/go-ethereum v1.11.5 => github.com/patex-ecosystem/patex-chain v1.0.1
+replace github.com/ethereum/go-ethereum v1.11.5 => github.com/patex-ecosystem/patex-chain v1.0.3
 
 //replace github.com/ethereum/go-ethereum v1.11.5 => ../go-ethereum

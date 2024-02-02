@@ -519,8 +519,8 @@ github.com/opentracing/opentracing-go v1.2.0/go.mod h1:GxEUsuufX4nBwe+T+Wl9TAgYr
 github.com/openzipkin/zipkin-go v0.1.1/go.mod h1:NtoC/o8u3JlF1lSlyPNswIbeQH9bJTmOf0Erfk+hxe8=
 github.com/patex-ecosystem/go-ethereum-hdwallet v0.1.3 h1:fhjsIBVv9ahbdlTb4RNBOmrzjGWJA8KqHW/nIMk725U=
 github.com/patex-ecosystem/go-ethereum-hdwallet v0.1.3/go.mod h1:Ad+23cgVO8JpUlSVdRLh6DyhIQ4/bVTOHBe0GK+YdxI=
-github.com/patex-ecosystem/patex-chain v1.0.1 h1:jlEjirUsv1yqyLtjG7MuavqIS0XIX3NQN3fX0zTGuQM=
-github.com/patex-ecosystem/patex-chain v1.0.1/go.mod h1:X9t7oeerFMU9/zMIjZKT/jbIca+O05QqtBTLjL+XVeA=
+github.com/patex-ecosystem/patex-chain v1.0.3 h1:F1Pl7AR0X20SKaFRGW1EeZWovF0mozGRebKNTxLmei4=
+github.com/patex-ecosystem/patex-chain v1.0.3/go.mod h1:X9t7oeerFMU9/zMIjZKT/jbIca+O05QqtBTLjL+XVeA=
 github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58 h1:onHthvaw9LFnH4t2DcNVpwGmV9E1BkGknEliJkfwQj0=
 github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58/go.mod h1:DXv8WO4yhMYhSNPKjeNKa5WY9YCIEBRbNzFFPJbWO6Y=
 github.com/pelletier/go-toml v1.2.0 h1:T5zMGML61Wp+FlcbWjRDT7yAxhJNAiPPLOFECq181zc=
