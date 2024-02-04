@@ -171,10 +171,12 @@ func CheckBatchV2(cfg *rollup.Config, log log.Logger, l1Blocks []eth.L1BlockRef,
 		return BatchDrop
 	}
 
-	// dependent on above timestamp check. If the timestamp is correct, then it must build on top of the safe head.
-	if batch.Batch.ParentHash != l2SafeHead.Hash {
-		log.Warn("ignoring batch with mismatching parent hash", "current_safe_head", l2SafeHead.Hash)
-		return BatchDrop
+	// Only when bt L2 < L1: dependent on above timestamp check. If the timestamp is correct, then it must build on top of the safe head.
+	if shifts == 1 {
+		if batch.Batch.ParentHash != l2SafeHead.Hash {
+			log.Warn("ignoring batch with mismatching parent hash", "current_safe_head", l2SafeHead.Hash)
+			return BatchDrop
+		}
 	}
 
 	// Filter out batches that were included too late.
