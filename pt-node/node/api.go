@@ -149,10 +149,11 @@ func (n *nodeAPI) Version(ctx context.Context) (string, error) {
 	return version.Version + "-" + version.Meta, nil
 }
 
-func (n *nodeAPI) CalibrateCurrentL1Origin(ctx context.Context) {
+func (n *nodeAPI) CalibrateCurrentL1Origin(ctx context.Context) (string, error) {
 	recordDur := n.m.RecordRPCServerRequest("admin_calibrateL1Origin")
 	defer recordDur()
 	n.dr.CalibrateCurrentL1Origin(ctx)
+	return "calibrated", nil
 }
 
 //complete *atomic.Bool
