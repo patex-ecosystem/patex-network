@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync/atomic"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -45,6 +46,8 @@ type Sequencer struct {
 	timeNow func() time.Time
 
 	nextAction time.Time
+
+	calibrateL1Origin atomic.Bool
 }
 
 func NewSequencer(log log.Logger, cfg *rollup.Config, engine derive.ResettableEngineControl, attributesBuilder derive.AttributesBuilder, l1OriginSelector L1OriginSelectorIface, metrics SequencerMetrics) *Sequencer {
@@ -65,6 +68,13 @@ func (d *Sequencer) StartBuildingBlock(ctx context.Context) error {
 
 	// Figure out which L1 origin block we're going to be building on top of.
 	l1Origin, shiftedEpoches, err := d.l1OriginSelector.FindL1Origin(ctx, l2Head)
+
+	// try reset l1 origin
+	if d.calibrateL1Origin.Load() == true {
+		l1Origin = d.engine.Origin()
+		d.calibrateL1Origin.Store(false)
+	}
+
 	if err != nil {
 		d.log.Error("Error finding next L1 Origin", "err", err)
 		return err
@@ -252,4 +262,8 @@ func (d *Sequencer) RunNextSequencerAction(ctx context.Context) (*eth.ExecutionP
 		}
 		return nil, nil
 	}
+}
+
+func (d *Sequencer) SetCalibrateCurrentL1Origin() {
+	d.calibrateL1Origin.Store(true)
 }

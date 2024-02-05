@@ -287,12 +287,6 @@ func CheckBatchV2(cfg *rollup.Config, log log.Logger, l1Blocks []eth.L1BlockRef,
 		return BatchDrop
 	}
 
-	// Filter out batches that were included too late.
-	if uint64(batch.Batch.EpochNum)+cfg.SeqWindowSize < batch.L1InclusionBlock.Number {
-		log.Warn("batch was included too late, sequence window expired")
-		return BatchDrop
-	}
-
 	// We can do this check earlier, but it's a more intensive one, so we do this last.
 	for i, txBytes := range batch.Batch.Transactions {
 		if len(txBytes) == 0 {

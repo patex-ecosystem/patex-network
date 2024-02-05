@@ -43,6 +43,7 @@ type EngineState interface {
 	Finalized() eth.L2BlockRef
 	UnsafeL2Head() eth.L2BlockRef
 	SafeL2Head() eth.L2BlockRef
+	Origin() eth.L1BlockRef
 }
 
 // EngineControl enables other components to build blocks with the Engine,
