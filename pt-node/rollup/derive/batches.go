@@ -142,8 +142,8 @@ func CheckBatch(cfg *rollup.Config, log log.Logger, l1Blocks []eth.L1BlockRef, l
 	return BatchAccept
 }
 
-// V2 CheckBatch version for L2 > L1 blocktime
-func CheckBatchV2(cfg *rollup.Config, log log.Logger, l1Blocks []eth.L1BlockRef, l2SafeHead eth.L2BlockRef, batch *BatchWithL1InclusionBlock) BatchValidity {
+// V3 CheckBatch version for L2 > L1 blocktime
+func CheckBatchV3(cfg *rollup.Config, log log.Logger, l1Blocks []eth.L1BlockRef, l2SafeHead eth.L2BlockRef, batch *BatchWithL1InclusionBlock) BatchValidity {
 	// add details to the log
 	log = log.New(
 		"batch_timestamp", batch.Batch.Timestamp,
@@ -261,8 +261,8 @@ func CheckBatchV2(cfg *rollup.Config, log log.Logger, l1Blocks []eth.L1BlockRef,
 	return BatchAccept
 }
 
-// V3 CheckBatch version for L2 > L1 blocktime
-func CheckBatchV3(cfg *rollup.Config, log log.Logger, l1Blocks []eth.L1BlockRef, l2SafeHead eth.L2BlockRef, batch *BatchWithL1InclusionBlock) BatchValidity {
+// V2 CheckBatch version for L2 > L1 blocktime
+func CheckBatchV2(cfg *rollup.Config, log log.Logger, l1Blocks []eth.L1BlockRef, l2SafeHead eth.L2BlockRef, batch *BatchWithL1InclusionBlock) BatchValidity {
 	// add details to the log
 	log = log.New(
 		"batch_timestamp", batch.Batch.Timestamp,
@@ -284,6 +284,12 @@ func CheckBatchV3(cfg *rollup.Config, log log.Logger, l1Blocks []eth.L1BlockRef,
 	}
 	if batch.Batch.Timestamp < nextTimestamp {
 		log.Warn("dropping batch with old timestamp", "min_timestamp", nextTimestamp)
+		return BatchDrop
+	}
+
+	// Filter out batches that were included too late.
+	if uint64(batch.Batch.EpochNum)+cfg.SeqWindowSize < batch.L1InclusionBlock.Number {
+		log.Warn("batch was included too late, sequence window expired")
 		return BatchDrop
 	}
 
