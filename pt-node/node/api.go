@@ -28,7 +28,7 @@ type driverClient interface {
 	ResetDerivationPipeline(context.Context) error
 	StartSequencer(ctx context.Context, blockHash common.Hash) error
 	StopSequencer(context.Context) (common.Hash, error)
-	CalibrateCurrentL1Origin(context.Context)
+	CalibrateOrigin(context.Context)
 }
 
 type rpcMetrics interface {
@@ -149,10 +149,10 @@ func (n *nodeAPI) Version(ctx context.Context) (string, error) {
 	return version.Version + "-" + version.Meta, nil
 }
 
-func (n *nodeAPI) CalibrateCurrentL1Origin(ctx context.Context) (string, error) {
-	recordDur := n.m.RecordRPCServerRequest("admin_calibrateCurrentL1Origin")
+func (n *nodeAPI) CalibrateOrigin(ctx context.Context) (string, error) {
+	recordDur := n.m.RecordRPCServerRequest("admin_calibrateOrigin")
 	defer recordDur()
-	n.dr.CalibrateCurrentL1Origin(ctx)
+	n.dr.CalibrateOrigin(ctx)
 	return "calibrated", nil
 }
 

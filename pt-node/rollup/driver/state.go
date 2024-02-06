@@ -410,7 +410,7 @@ func (s *Driver) StopSequencer(ctx context.Context) (common.Hash, error) {
 	}
 }
 
-func (s *Driver) CalibrateCurrentL1Origin(ctx context.Context) {
+func (s *Driver) CalibrateOrigin(ctx context.Context) {
 	s.sequencer.SetCalibrateCurrentL1Origin()
 }
 
