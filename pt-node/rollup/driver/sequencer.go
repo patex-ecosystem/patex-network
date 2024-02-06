@@ -71,6 +71,7 @@ func (d *Sequencer) StartBuildingBlock(ctx context.Context) error {
 
 	// try reset l1 origin
 	if d.calibrateL1Origin.Load() == true {
+		d.log.Info("calibrating origin", "old", l1Origin, "new", d.engine.Origin())
 		l1Origin = d.engine.Origin()
 		d.calibrateL1Origin.Store(false)
 	}
