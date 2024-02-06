@@ -150,7 +150,7 @@ func (n *nodeAPI) Version(ctx context.Context) (string, error) {
 }
 
 func (n *nodeAPI) CalibrateCurrentL1Origin(ctx context.Context) (string, error) {
-	recordDur := n.m.RecordRPCServerRequest("admin_calibrateL1Origin")
+	recordDur := n.m.RecordRPCServerRequest("admin_calibrateCurrentL1Origin")
 	defer recordDur()
 	n.dr.CalibrateCurrentL1Origin(ctx)
 	return "calibrated", nil
