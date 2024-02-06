@@ -155,5 +155,3 @@ func (n *nodeAPI) Version(ctx context.Context) (string, error) {
 	defer recordDur()
 	return version.Version + "-" + version.Meta, nil
 }
-
-//complete *atomic.Bool
