@@ -66,6 +66,13 @@ func (n *adminAPI) StopSequencer(ctx context.Context) (common.Hash, error) {
 	return n.dr.StopSequencer(ctx)
 }
 
+func (n *adminAPI) CalibrateOrigin(ctx context.Context) (string, error) {
+	recordDur := n.m.RecordRPCServerRequest("admin_calibrateOrigin")
+	defer recordDur()
+	n.dr.CalibrateOrigin(ctx)
+	return "calibrated", nil
+}
+
 type nodeAPI struct {
 	config *rollup.Config
 	client l2EthClient
@@ -147,13 +154,6 @@ func (n *nodeAPI) Version(ctx context.Context) (string, error) {
 	recordDur := n.m.RecordRPCServerRequest("patex_version")
 	defer recordDur()
 	return version.Version + "-" + version.Meta, nil
-}
-
-func (n *nodeAPI) CalibrateOrigin(ctx context.Context) (string, error) {
-	recordDur := n.m.RecordRPCServerRequest("admin_calibrateOrigin")
-	defer recordDur()
-	n.dr.CalibrateOrigin(ctx)
-	return "calibrated", nil
 }
 
 //complete *atomic.Bool
