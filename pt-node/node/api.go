@@ -116,7 +116,7 @@ func (n *nodeAPI) OutputAtBlock(ctx context.Context, number hexutil.Uint64) (*et
 		return nil, fmt.Errorf("proof %w", ethereum.NotFound)
 	}
 	// make sure that the proof (including storage hash) that we retrieved is correct by verifying it against the state-root
-	if err := proof.Verify(head.Root()); err != nil {
+	if err := proof.VerifyL2(head.Root()); err != nil {
 		n.log.Error("invalid withdrawal root detected in block", "stateRoot", head.Root(), "blocknum", number, "msg", err)
 		return nil, fmt.Errorf("invalid withdrawal root hash, state root was %s: %w", head.Root(), err)
 	}

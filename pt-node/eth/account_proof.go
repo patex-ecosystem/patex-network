@@ -23,8 +23,12 @@ type AccountResult struct {
 
 	Address     common.Address `json:"address"`
 	Balance     *hexutil.Big   `json:"balance"`
+	Fixed       *hexutil.Big   `json:"fixed"`
+	Shares      *hexutil.Big   `json:"shares"`
+	Remainder   *hexutil.Big   `json:"remainder"`
 	CodeHash    common.Hash    `json:"codeHash"`
 	Nonce       hexutil.Uint64 `json:"nonce"`
+	Flags       hexutil.Uint64 `json:"flags"`
 	StorageHash common.Hash    `json:"storageHash"`
 
 	// Optional
@@ -32,7 +36,7 @@ type AccountResult struct {
 }
 
 // Verify an account (and optionally storage) proof from the getProof RPC. See https://eips.ethereum.org/EIPS/eip-1186
-func (res *AccountResult) Verify(stateRoot common.Hash) error {
+func (res *AccountResult) verify(stateRoot common.Hash, accountClaimed []any) error {
 	// verify storage proof values, if any, against the storage trie root hash of the account
 	for i, entry := range res.StorageProof {
 		// load all MPT nodes into a DB
@@ -51,6 +55,9 @@ func (res *AccountResult) Verify(stateRoot common.Hash) error {
 		if err != nil {
 			return fmt.Errorf("failed to verify storage value %d with key %s (path %x) in storage trie %s: %w", i, entry.Key, path, res.StorageHash, err)
 		}
+		if val == nil && entry.Value.ToInt().Cmp(common.Big0) == 0 { // empty storage is zero by default
+			continue
+		}
 		comparison, err := rlp.EncodeToBytes(entry.Value.ToInt().Bytes())
 		if err != nil {
 			return fmt.Errorf("failed to encode storage value %d with key %s (path %x) in storage trie %s: %w", i, entry.Key, path, res.StorageHash, err)
@@ -60,7 +67,6 @@ func (res *AccountResult) Verify(stateRoot common.Hash) error {
 		}
 	}
 
-	accountClaimed := []any{uint64(res.Nonce), res.Balance.ToInt().Bytes(), res.StorageHash, res.CodeHash}
 	accountClaimedValue, err := rlp.EncodeToBytes(accountClaimed)
 	if err != nil {
 		return fmt.Errorf("failed to encode account from retrieved values: %w", err)
@@ -89,4 +95,14 @@ func (res *AccountResult) Verify(stateRoot common.Hash) error {
 			"  proof:   %x", accountClaimedValue, accountProofValue)
 	}
 	return err
+}
+
+func (res *AccountResult) Verify(stateRoot common.Hash) error {
+	accountClaimed := []any{uint64(res.Nonce), res.Balance.ToInt().Bytes(), res.StorageHash, res.CodeHash}
+	return res.verify(stateRoot, accountClaimed)
+}
+
+func (res *AccountResult) VerifyL2(stateRoot common.Hash) error {
+	accountClaimed := []any{uint64(res.Nonce), uint8(res.Flags), res.Fixed.ToInt().Bytes(), res.Shares.ToInt().Bytes(), res.Remainder.ToInt().Bytes(), res.StorageHash, res.CodeHash}
+	return res.verify(stateRoot, accountClaimed)
 }
