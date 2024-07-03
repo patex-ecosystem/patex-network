@@ -540,6 +540,7 @@ github.com/patex-ecosystem/patex-chain v1.0.5 h1:dGjqinxhUud7JnF4q6JapBlEHv2XzkO
 github.com/patex-ecosystem/patex-chain v1.0.5/go.mod h1:JJ+WerUeapiQ7biLxNBdeC3D1Mar09AUoVwTB6es53s=
 github.com/patex-ecosystem/patex-chain v1.0.6 h1:6SgVUW2Go71NExEIdYdhqyn9zpZGXT1mhDaufkxdPWg=
 github.com/patex-ecosystem/patex-chain v1.0.6/go.mod h1:JJ+WerUeapiQ7biLxNBdeC3D1Mar09AUoVwTB6es53s=
+github.com/patex-ecosystem/patex-chain v1.0.7/go.mod h1:JJ+WerUeapiQ7biLxNBdeC3D1Mar09AUoVwTB6es53s=
 github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58 h1:onHthvaw9LFnH4t2DcNVpwGmV9E1BkGknEliJkfwQj0=
 github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58/go.mod h1:DXv8WO4yhMYhSNPKjeNKa5WY9YCIEBRbNzFFPJbWO6Y=
 github.com/pelletier/go-toml v1.2.0 h1:T5zMGML61Wp+FlcbWjRDT7yAxhJNAiPPLOFECq181zc=
