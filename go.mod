@@ -181,6 +181,6 @@ require (
 	rsc.io/tmplfunc v0.0.3 // indirect
 )
 
-replace github.com/ethereum/go-ethereum v1.11.5 => github.com/patex-ecosystem/patex-chain v1.0.7
+replace github.com/ethereum/go-ethereum v1.11.5 => github.com/patex-ecosystem/patex-chain v1.0.10
 
 //replace github.com/ethereum/go-ethereum v1.11.5 => ../go-ethereum
