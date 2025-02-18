@@ -18,7 +18,7 @@ var ParamsByChainID = map[int]*Params{
 		// Regenesis 4 (Nov 11 2021) contained a supply bug such that the total PVM ETH
 		// supply was 1.628470012 ETH greater than the sum balance of every account migrated
 		// / during the regenesis. A further 0.0012 ETH was incorrectly not removed from the
-		// total supply by accidental invocations of the Saurik bug (https://www.saurik.com/patex.html).
+		// total supply by accidental invocations of the Saurik bug (https://www.saurik.com).
 		new(big.Int).SetUint64(1627270011999999992),
 	},
 	5: {
